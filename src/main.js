@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import rackrow_sub from "../jsonFiles/storagelocation_rackrow_sub.json"
-import attributeHandler from "./attributeHandler";
+import AttributeHandler from './attributeHandler.js';
 import storageLocationHandler from "./storageLocationHandler";
 import evaluateRule from "./storageEvaluator";
 import parsedRules from "../jsonFiles/parsed_storage_rules.json";
@@ -8,6 +8,7 @@ import { DropShadowFilter } from '@pixi/filter-drop-shadow';
 import chroma from "chroma-js";
 import loadingStations from "../jsonFiles/storagelocation_loadingstation.json";
 import { initCanvas } from './canvas/initCanvas.js';
+import { drawRackRows } from './canvas/drawRackRows.js';
 
 const {
   app,
@@ -23,7 +24,8 @@ const {
 const colorScale = chroma.scale(['#FF0000', '#FFFF00', '#00FF00']).domain([0, 1000]);
 
 const rackrow_subs = rackrow_sub.results[0].items
-let attrHandler = new attributeHandler(rackrow_subs);
+const attrHandler = new AttributeHandler(rackrow_subs);
+console.log("🔍 attrHandler.attributeMap:", attrHandler.attributeMap);
 console.log(rackrow_subs);
 
 const storedColors = JSON.parse(localStorage.getItem("attributeColors") || "{}");
@@ -34,7 +36,7 @@ window.ruleSelector = selector; // 👈 attach to global window object
 
 
 let labelsVisible = false;
-let previousZoom = zoomScale;
+let previousZoom = zoomScale.value;
 
 const rowLabelMeta = [];
 const locationMap = new Map();
@@ -57,148 +59,149 @@ document.getElementById("layer2Toggle")?.addEventListener("change", (e) => {
   });
   
 
-app.canvas.addEventListener('pointerdown', (e) => {
-  isDragging = true;
-  lastPos = { x: e.clientX, y: e.clientY };
-  viewport.cursor = 'grabbing';
-  console.log(screenToWorld(e.clientX, e.clientY));
-});
+// app.canvas.addEventListener('pointerdown', (e) => {
+//   isDragging = true;
+//   lastPos = { x: e.clientX, y: e.clientY };
+//   viewport.cursor = 'grabbing';
+//   console.log(screenToWorld(e.clientX, e.clientY));
+// });
 
-app.canvas.addEventListener('pointermove', (e) => {
-    if (!isDragging) return;
-    const dx = e.clientX - lastPos.x;
-    const dy = e.clientY - lastPos.y;
+// app.canvas.addEventListener('pointermove', (e) => {
+//     if (!isDragging) return;
+//     const dx = e.clientX - lastPos.x;
+//     const dy = e.clientY - lastPos.y;
   
-    // Fix horizontal drift by accounting for flipped stage scale
-    const scaleFixX = app.stage.scale.x === -1 ? -1 : 1;
+//     // Fix horizontal drift by accounting for flipped stage scale
+//     const scaleFixX = app.stage.scale.x === -1 ? -1 : 1;
   
-    viewport.x += dx * scaleFixX;
-    viewport.y += dy;
+//     viewport.x += dx * scaleFixX;
+//     viewport.y += dy;
   
-    lastPos = { x: e.clientX, y: e.clientY };
-    //renderLabels();
-  });
+//     lastPos = { x: e.clientX, y: e.clientY };
+//     //renderLabels();
+//   });
   
-app.canvas.addEventListener('pointerup', () => {
-  isDragging = false;
-  viewport.cursor = 'grab';
-});
+// app.canvas.addEventListener('pointerup', () => {
+//   isDragging = false;
+//   viewport.cursor = 'grab';
+// });
 
-app.canvas.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  const zoomAmount = e.deltaY > 0 ? 0.9 : 1.1;
-  zoomScale *= zoomAmount;
-  zoomScale = Math.min(Math.max(zoomScale, 0.002), 5);
+// app.canvas.addEventListener('wheel', (e) => {
+//   e.preventDefault();
+//   const zoomAmount = e.deltaY > 0 ? 0.9 : 1.1;
+//   zoomScale *= zoomAmount;
+//   zoomScale = Math.min(Math.max(zoomScale, 0.002), 5);
 
-  const rect = app.canvas.getBoundingClientRect();
-  const mouseX = (e.clientX - rect.left);
-  const mouseY = (e.clientY - rect.top);
-  const localX = (mouseX - viewport.x) / viewport.scale.x;
-  const localY = (mouseY - viewport.y) / viewport.scale.y;
-  viewport.scale.set(zoomScale);
-  viewport.x = mouseX - localX * zoomScale;
-  viewport.y = mouseY - localY * zoomScale;
-  console.log("zoomScale:", zoomScale);
-  //renderLabels();
-}, { passive: false });
+//   const rect = app.canvas.getBoundingClientRect();
+//   const mouseX = (e.clientX - rect.left);
+//   const mouseY = (e.clientY - rect.top);
+//   const localX = (mouseX - viewport.x) / viewport.scale.x;
+//   const localY = (mouseY - viewport.y) / viewport.scale.y;
+//   viewport.scale.set(zoomScale);
+//   viewport.x = mouseX - localX * zoomScale;
+//   viewport.y = mouseY - localY * zoomScale;
+//   console.log("zoomScale:", zoomScale);
+//   //renderLabels();
+// }, { passive: false });
 
 main();
 
 
 
-function drawRackRows(rack, baseY = 0, texture) {
-  const maxLocations = 100;
-  const startX = parseFloat(rack.location1coord);
-  const endX = parseFloat(rack.locationncoord);
-  const rowY = parseFloat(rack.rowcoord);
-  const height = parseFloat(rack.locationheight);
+// function drawRackRows(rack, baseY = 0, texture) {
+//   const maxLocations = 100;
+//   const startX = parseFloat(rack.location1coord);
+//   const endX = parseFloat(rack.locationncoord);
+//   const rowY = parseFloat(rack.rowcoord);
+//   const height = parseFloat(rack.locationheight);
 
-  if ([startX, endX, rowY, height].some(isNaN)) {
-    console.warn("Invalid rack data", rack);
-    return;
-  }
+//   if ([startX, endX, rowY, height].some(isNaN)) {
+//     console.warn("Invalid rack data", rack);
+//     return;
+//   }
 
-  const rackWidth = Math.abs(endX - startX);
-  const locCount = (rack.to_location - rack.from_location) + 1;
-  let locWidth = rackWidth / locCount;
-  if (locWidth < 500) locWidth = 1500;
+//   const rackWidth = Math.abs(endX - startX);
+//   const locCount = (rack.to_location - rack.from_location) + 1;
+//   let locWidth = rackWidth / locCount;
+//   if (locWidth < 500) locWidth = 1500;
 
-  let firstSprite = null;
-  let lastSprite = null;
-  const x0 = endX;
+//   let firstSprite = null;
+//   let lastSprite = null;
+//   const x0 = endX;
 
-  for (let i = 0; i < locCount; i++) {
-    const locKey = rack.bay + '-' + rack.area + '-' + rack.rowname + '-' + String(parseInt(rack.to_location) - parseInt(i));
-    const sprite = new PIXI.Sprite(texture);
-    sprite.x = x0 + i * locWidth;
-    sprite.y = rowY;
-    sprite.width = locWidth - 200;
-    sprite.height = height;
+//   for (let i = 0; i < locCount; i++) {
+//     const locKey = rack.bay + '-' + rack.area + '-' + rack.rowname + '-' + String(parseInt(rack.to_location) - parseInt(i));
+//     const sprite = new PIXI.Sprite(texture);
+//     sprite.x = x0 + i * locWidth;
+//     sprite.y = rowY;
+//     sprite.width = locWidth - 200;
+//     sprite.height = height;
     
-    const attrList = attrHandler.attributeMap.get(locKey);
-    if (attrList && attrList.length > 0) {
-      sprite.attributes = attrList.map(attr => {
-        const meta = attrHandler.attributeMeta.get(attr.attributeId);
-        return {
-          id: attr.attributeId,
-          name: meta?.name || `Attribute ${attr.attributeId}`,
-          description: meta?.description || ""
-        };
-      });
+//     const attrList = attrHandler.attributeMap.get(locKey);
+//     if (attrList && attrList.length > 0) {
+//       sprite.attributes = attrList.map(attr => {
+//         const meta = attrHandler.attributeMeta.get(attr.attributeId);
+//         return {
+//           id: attr.attributeId,
+//           name: meta?.name || `Attribute ${attr.attributeId}`,
+//           description: meta?.description || ""
+//         };
+//       });
 
-      // Optional: visually mark the sprite if it has attributes
-      //sprite.tint = 0x00cc66;
-    }
+//       // Optional: visually mark the sprite if it has attributes
+//       //sprite.tint = 0x00cc66;
+//     }
 
-    locationMap.set(locKey, sprite);
-    sprite.locationKey = locKey;
-    //viewport.addChild(sprite);
-    layer1Container.addChild(sprite);
-    if (i === 0) firstSprite = sprite;
-    if (i === locCount - 1) lastSprite = sprite;
-    sprite.eventMode = "static";
-    sprite.cursor = "pointer";
-    sprite.on("pointerdown", () => {
+//     locationMap.set(locKey, sprite);
+//     sprite.locationKey = locKey;
+//     //viewport.addChild(sprite);
+//     layer1Container.addChild(sprite);
+//     if (i === 0) firstSprite = sprite;
+//     if (i === locCount - 1) lastSprite = sprite;
+//     sprite.eventMode = "static";
+//     sprite.cursor = "pointer";
+//     sprite.on("pointerdown", () => {
         
-        spriteOnClick(sprite);
-      });
+//         spriteOnClick(sprite);
+//       });
       
-  }
+//   }
 
-if (firstSprite && lastSprite) {
-    let rowMidX = (firstSprite.x + lastSprite.x + locWidth) / 2;
-    let rowMidY = rowY - height;
-    if (rack.rowname === "SHO" || rack.rowname ==="PR1" || rack.rowname ==="PR2" || rack.rowname ==="PR3" || rack.rowname === "SHI" || rack.rowname ==="CPL" || rack.rowname === "PAC"){
-        rowMidX = ((firstSprite.x + lastSprite.x ) / 2) ;
-        rowMidY = rowY + height/2 - 200;
-        rowLabelMeta.push({ text: rack.rowname, x: rowMidX, y: rowMidY , type: "mid"});
-    }else if (rack.rowname === "CPL"){
-        rowMidX = ((firstSprite.x + lastSprite.x ) / 2) + locWidth - 200;
-        rowLabelMeta.push({ text: rack.rowname, x: rowMidX, y: rowMidY , type: "mid"});
+// if (firstSprite && lastSprite) {
+//     let rowMidX = (firstSprite.x + lastSprite.x + locWidth) / 2;
+//     let rowMidY = rowY - height;
+//     if (rack.rowname === "SHO" || rack.rowname ==="PR1" || rack.rowname ==="PR2" || rack.rowname ==="PR3" || rack.rowname === "SHI" || rack.rowname ==="CPL" || rack.rowname === "PAC"){
+//         rowMidX = ((firstSprite.x + lastSprite.x ) / 2) ;
+//         rowMidY = rowY + height/2 - 200;
+//         rowLabelMeta.push({ text: rack.rowname, x: rowMidX, y: rowMidY , type: "mid"});
+//     }else if (rack.rowname === "CPL"){
+//         rowMidX = ((firstSprite.x + lastSprite.x ) / 2) + locWidth - 200;
+//         rowLabelMeta.push({ text: rack.rowname, x: rowMidX, y: rowMidY , type: "mid"});
 
-    }else{
-        rowMidX = ((firstSprite.x + lastSprite.x ) / 2) + locWidth - 200;
-        rowLabelMeta.push({ text: rack.rowname, x: rowMidX, y: rowMidY , type: "mid"});
-    }
-    // Mid-row label
-    //rowLabelMeta.push({ text: rack.rowname, x: rowMidX, y: rowMidY , type: "mid"});
+//     }else{
+//         rowMidX = ((firstSprite.x + lastSprite.x ) / 2) + locWidth - 200;
+//         rowLabelMeta.push({ text: rack.rowname, x: rowMidX, y: rowMidY , type: "mid"});
+//     }
+//     // Mid-row label
+//     //rowLabelMeta.push({ text: rack.rowname, x: rowMidX, y: rowMidY , type: "mid"});
   
-    // Start label (to_location) - inside first sprite
-    rowLabelMeta.push({
-        ...createLabelCenteredInSprite(`${rack.to_location}`, firstSprite),
-        type: "start"
-      });
-    // End label (from_location) - inside last sprite
-    rowLabelMeta.push({
-        ...createLabelCenteredInSprite(`${rack.from_location}`, lastSprite),
-        type: "end"
-      });
-  }
-  
-  
+//     // Start label (to_location) - inside first sprite
+//     rowLabelMeta.push({
+//         ...createLabelCenteredInSprite(`${rack.to_location}`, firstSprite),
+//         type: "start"
+//       });
+//     // End label (from_location) - inside last sprite
+//     rowLabelMeta.push({
+//         ...createLabelCenteredInSprite(`${rack.from_location}`, lastSprite),
+//         type: "end"
+//       });
+//   }
   
   
-}
+  
+  
+// }
+
 
 function createLabelCenteredInSprite(text, sprite, fontSize = 1000) {
     const dummy = new PIXI.BitmapText({
@@ -218,7 +221,7 @@ function createLabelCenteredInSprite(text, sprite, fontSize = 1000) {
 function renderBitmapLabels() {
     labelLayer.removeChildren();
   
-    if (zoomScale > 0.0075) {
+    if (zoomScale.value > 0.0075) {
   
         rowLabelMeta.forEach(meta => {
           const label = new PIXI.BitmapText({
@@ -230,7 +233,7 @@ function renderBitmapLabels() {
           });
       
           label.x = meta.x;
-          if (zoomScale > 0.015 && (meta.type === "start" || meta.type === "end")) {
+          if (zoomScale.value > 0.015 && (meta.type === "start" || meta.type === "end")) {
             label.y = meta.y - 1000;
           } else {
             label.y = meta.y;
@@ -241,7 +244,7 @@ function renderBitmapLabels() {
         });
     }
 
-    if (zoomScale > 0.015) {
+    if (zoomScale.value > 0.015) {
         locationMap.forEach((sprite, key) => {
          // 🔥 Render heat score labels 
          if (sprite.heatScore == null || isNaN(sprite.heatScore)) return;
@@ -268,12 +271,12 @@ function renderBitmapLabels() {
 
   }
   app.ticker.add(() => {
-    const shouldShow = zoomScale >= 0.0075;
+    const shouldShow = zoomScale.value >= 0.0075;
   
     // Only re-render if zoom state changes
-    if (shouldShow !== labelsVisible || Math.abs(previousZoom - zoomScale) > 0.00001) {
+    if (shouldShow !== labelsVisible || Math.abs(previousZoom - zoomScale.value) > 0.00001) {
       labelsVisible = shouldShow;
-      previousZoom = zoomScale;
+      previousZoom = zoomScale.value;
   
       if (labelsVisible) {
         renderBitmapLabels(); // render only once
@@ -706,8 +709,19 @@ async function main() {
   //const locationTexture = createStylizedTexture(1230, 600, 100, "#ffffff", "#dddddd");
   let locationTexture = await PIXI.Assets.load('/src/assets/deposit.png')
   rackrow_subs.forEach(rack => {
-    drawRackRows(rack, 0, locationTexture);
+    drawRackRows(
+      rack,
+      locationTexture,
+      attrHandler,
+      locationMap,
+      rowLabelMeta,
+      spriteOnClick,
+      layer1Container
+    );
   });
+  // rackrow_subs.forEach(rack => {
+  //   drawRackRows(rack, 0, locationTexture);
+  // });
   drawLoadingStations();
   viewport.addChild(labelLayer);
   //slHandler.init();

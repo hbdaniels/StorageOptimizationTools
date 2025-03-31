@@ -27,6 +27,7 @@ export async function initCanvas({ width = 1200, height = 800, backgroundColor =
   viewport.addChild(layer1Container);
   viewport.addChild(layer2Container);
   viewport.addChild(attributeUnderlay);
+  viewport.addChild(labelLayer);
 
   app.stage.scale.x = -1;
   app.stage.position.x = app.screen.width;
@@ -35,7 +36,7 @@ export async function initCanvas({ width = 1200, height = 800, backgroundColor =
   // Enable panning and zoom
   let isDragging = false;
   let lastPos = { x: 0, y: 0 };
-  let zoomScale = 0.002;
+  let zoomScale = { value: 0.002 };
 
   viewport.interactive = true;
   viewport.cursor = 'grab';
@@ -65,17 +66,17 @@ export async function initCanvas({ width = 1200, height = 800, backgroundColor =
   app.canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
     const zoomAmount = e.deltaY > 0 ? 0.9 : 1.1;
-    zoomScale *= zoomAmount;
-    zoomScale = Math.min(Math.max(zoomScale, 0.002), 5);
+    zoomScale.value *= zoomAmount;
+    zoomScale.value = Math.min(Math.max(zoomScale.value, 0.002), 5);
 
     const rect = app.canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
     const localX = (mouseX - viewport.x) / viewport.scale.x;
     const localY = (mouseY - viewport.y) / viewport.scale.y;
-    viewport.scale.set(zoomScale);
-    viewport.x = mouseX - localX * zoomScale;
-    viewport.y = mouseY - localY * zoomScale;
+    viewport.scale.set(zoomScale.value);
+    viewport.x = mouseX - localX * zoomScale.value;
+    viewport.y = mouseY - localY * zoomScale.value;
   }, { passive: false });
 
   return {
