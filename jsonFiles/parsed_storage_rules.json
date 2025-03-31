@@ -1,0 +1,1441 @@
+[
+  {
+    "name": "Gewicht",
+    "ruleid": 6,
+    "bay": "B",
+    "mainarea": "KW",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "Coil.Gewicht <= 12000",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "CalcSupporter() &&\r\n(Stützcoil1.Gewicht * 1.15 < Coil.Gewicht || \r\nStützcoil2.Gewicht * 1.15 < Coil.Gewicht)",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "restriction": "Max. 15% Gewichtüberschreitung aufliegender Coils bis 12 Tonnen",
+            "restrictiontype": "HARD"
+          }
+        },
+        "else": {
+          "enabled": "true",
+          "condition": "Coil.Gewicht > 12000 && Coil.Gewicht <= 24000",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "condition": "CalcSupporter() &&\r\n(Stützcoil1.Gewicht * 1.10 < Coil.Gewicht || \r\nStützcoil2.Gewicht * 1.10 < Coil.Gewicht)\r\n",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "restriction": "Max. 10% Gewichtüberschreitung aufliegender Coils zwischen 12 und 24 Tonnen",
+              "restrictiontype": "HARD"
+            }
+          },
+          "else": {
+            "enabled": "true",
+            "condition": "Coil.Gewicht > 24000",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "condition": "CalcSupporter() &&\r\n(Stützcoil1.Gewicht * 1.07 < Coil.Gewicht || \r\nStützcoil2.Gewicht * 1.07 < Coil.Gewicht)\r\n",
+              "restrictiontype": "NONE",
+              "then": {
+                "enabled": "true",
+                "restriction": "Max. 7% Gewichtüberschreitung aufliegender Coils ab 24 Tonnen\r\n",
+                "restrictiontype": "HARD"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "Gesperrte Coils nicht belegen",
+    "ruleid": 7,
+    "bay": "B",
+    "mainarea": "KW",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "CalcSupporter() && (Stützcoil1.GesperrtLVS || Stützcoil2.GesperrtLVS\r\n)",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "restriction": "Gesperrte Coils dürfen nicht belegt werden!",
+          "restrictiontype": "HARD"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Alter Lagerort ist schlecht",
+    "ruleid": 8,
+    "bay": "B",
+    "mainarea": "KW",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "LagerortIntern == Coil.LagerortVorLastaufnahmeIntern",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "-1000",
+          "restrictiontype": "NONE"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Lage 1 bevorzugen",
+    "ruleid": 12,
+    "bay": "B",
+    "mainarea": "KW",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "Lage == 1",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "10",
+          "restrictiontype": "NONE"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Kurze Fahrwege",
+    "ruleid": 17,
+    "bay": "B",
+    "mainarea": "KW",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "action": "1000 - CalcDistanceDijkstra()/100\r\n",
+        "restrictiontype": "NONE"
+      }
+    ]
+  },
+  {
+    "name": "Kleines Material möglichst in Lage 2",
+    "ruleid": 18,
+    "bay": "B",
+    "mainarea": "KW",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "Lage == 2 && Coil.Außendurchmesser < 1450",
+        "restrictiontype": "NONE",
+        "comment": "Von 1000 auf 1450 geändert. Zu viele kleine Coils in Lage 1. Steinhauer 06.09.2022",
+        "then": {
+          "enabled": "true",
+          "action": "5",
+          "restrictiontype": "NONE"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Umlagerungen möglichst im gleichen Feld",
+    "ruleid": 19,
+    "bay": "B",
+    "mainarea": "KW",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "GetAreaname(LagerortIntern) == GetAreaname(Coil.LagerortVorLastaufnahmeIntern)",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "500",
+          "restrictiontype": "NONE"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Transportauftrag nicht belegen",
+    "ruleid": 20,
+    "bay": "B",
+    "mainarea": "KW",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "BelegtAnderenAuftrag",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "restriction": "Transportauftrag nicht belegen",
+          "restrictiontype": "WEAK"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Trailereinlagerung möglichst das gleiche Feld wie FV3 Versogung",
+    "ruleid": 21,
+    "bay": "B",
+    "mainarea": "KW",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "GetAreaname(Coil.LagerortVorLastaufnahmeIntern) == 'TR' && \r\nAreaWithFV3Material(Feld)",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "700",
+          "restrictiontype": "NONE"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Verplantes Material möglichst nicht belegen",
+    "ruleid": 22,
+    "bay": "B",
+    "mainarea": "KW",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "CalcSupporter() && \r\n(Stützcoil1.MaterialZurFV3 == MaterialToFV3.PLANED || \r\n Stützcoil2.MaterialZurFV3 == MaterialToFV3.PLANED )",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "-350",
+          "restrictiontype": "NONE"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Schmales Material in dritte Reihe und Feld 5",
+    "ruleid": 23,
+    "bay": "B",
+    "mainarea": "KW",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "IsInAttribute(LagerortIntern, 'SchmaleReihen')\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "Coil.Breite < 1400",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "+700",
+            "restrictiontype": "NONE"
+          },
+          "else": {
+            "enabled": "true",
+            "action": "-500",
+            "restrictiontype": "NONE"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "Ringe mit Breite < 1000 mm nicht in erster Lage",
+    "ruleid": 24,
+    "bay": "B",
+    "mainarea": "KW",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "Lage == 1 && Coil.Breite <= 1000 && AktuellesZiel.Feld != 'FV'",
+        "restrictiontype": "NONE",
+        "comment": "Regel darf im Einlauf nicht greifen. Daher AktuellesZiel.Feld !='FV' eingefügt",
+        "then": {
+          "enabled": "true",
+          "restriction": "Schmale Ringe dürfen nicht in der ersten Lage liegen",
+          "restrictiontype": "HARD"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Schmale Coils breite Reihen Lage 2",
+    "ruleid": 25,
+    "bay": "B",
+    "mainarea": "KW",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "IsInAttribute(LagerortIntern, 'Hauptlager')&&Lage==2 && Coil.Breite <1400",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "+200",
+          "restrictiontype": "NONE"
+        },
+        "else": {
+          "enabled": "true",
+          "action": "-200",
+          "restrictiontype": "NONE"
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_Always-Lower-Layer",
+    "ruleid": 89,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "CurrentDestination.Attribute == '3tn_ST22_SB-1-STAT' ||\r\n\r\nOrder.ForeignOrderID > 0",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "+5000",
+          "restrictiontype": "NONE"
+        },
+        "else": {
+          "enabled": "true",
+          "action": "-Layer",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "Contains(Order.OrderCategories,'_PP_')\r\n&&\r\nGetCoilUtilization('22PP') > 95\r\n&&\r\nLayer==2",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "(\r\nContains(Order.OrderCategories,'_BC_')\r\n)\r\n&&\r\nGetCoilUtilization('22BC') > 95\r\n&&\r\nLayer == 2",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "Contains(Order.OrderCategories,'_BS_')\r\n&&\r\nGetCoilUtilization('22BS') > 95\r\n&&\r\nLayer == 2",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "Contains(Order.OrderCategories,'_QU_')\r\n&&\r\nGetCoilUtilization('22QU') > 95\r\n&&\r\nLayer == 2\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000\r\n",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "(\r\nContains(Order.OrderCategories,'_RR_')\r\n)\r\n&&\r\nGetCoilUtilization('22RR') > 95\r\n&&\r\nLayer == 2\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "Contains(Order.OrderCategories,'_SB_')\r\n&&\r\nGetCoilUtilization('22SB') > 95\r\n&&\r\nLayer == 2\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "(\r\nContains(Order.OrderCategories,'_SC_')\r\n)\r\n&&\r\nGetCoilUtilization('22SC') > 95\r\n&&\r\nLayer == 2\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "(\r\nContains(Order.OrderCategories,'_SL_')\r\n)\r\n&&\r\nGetCoilUtilization('22SL') > 95\r\n&&\r\nLayer == 2\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "(\r\nContains(Order.OrderCategories,'_SP_')\r\n)\r\n&&\r\nGetCoilUtilization('22SP') > 95\r\n&&\r\nLayer == 2\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "(\r\nContains(Order.OrderCategories,'_TR_')\r\n)\r\n&&\r\nGetCoilUtilization('22TR') > 95\r\n&&\r\nLayer == 2\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_Do not put coils on coils with transport order",
+    "ruleid": 93,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "OccupiesAnotherOrder\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "-1000",
+          "restrictiontype": "NONE"
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_Never-L2 unless we have bulk scrap",
+    "ruleid": 90,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "false",
+        "condition": "Layer==2 && Order.ForeignOrderID ==0\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "restriction": "'Do not use Layer 2'",
+          "restrictiontype": "WEAK",
+          "comment": "Do not use Layer 2"
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST22_BC",
+    "ruleid": 107,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST22_BC')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST22_BC-1-DYNA')",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*(Location-19)/3-299*(19-ConvertToDecimal(Row))/7",
+            "restrictiontype": "NONE"
+          },
+          "else": {
+            "enabled": "true",
+            "condition": "IsInAttribute(StorageLocation,'3tn_ST22_BC-2-DYNA')",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "action": "900*(Location-29)/6-149*(27-ConvertToDecimal(Row))/14",
+              "restrictiontype": "NONE"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST22_BS",
+    "ruleid": 108,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST22_BS')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST22_BS-1-DYNA')",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*(120-Location)/75-11*(25-ConvertToDecimal(Row))/8",
+            "restrictiontype": "NONE"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST22_SL",
+    "ruleid": 104,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST22_SL')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST22_SL-1-STAT')",
+          "restrictiontype": "NONE",
+          "comment": "Static Sltting Line Area befotr getting into Entry",
+          "else": {
+            "enabled": "true",
+            "condition": "IsInAttribute(StorageLocation,'3tn_ST22_SL-2-DYNA')",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "action": "900*(Location-1)/19-47*(ConvertToDecimal(Row)-12)/11",
+              "restrictiontype": "NONE"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST22_PP",
+    "ruleid": 109,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST22_PP')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST22_PP-1-DYNA')",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*(45-Location)/9+99*(23-ConvertToDecimal(Row))/5",
+            "restrictiontype": "NONE"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST22_QU",
+    "ruleid": 110,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST22_QU')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST22QU-1-STAT')",
+          "restrictiontype": "NONE"
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST22_RR",
+    "ruleid": 111,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST22_RR')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST22_RR-1-STAT')",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*(108-Location)/73",
+            "restrictiontype": "NONE"
+          },
+          "else": {
+            "enabled": "true",
+            "condition": "IsInAttribute(StorageLocation,'3tn_ST22_RR-2-DYNA')",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "action": "900*(108-Location)/63-14*(ConvertToDecimal(Row)-18)/5",
+              "restrictiontype": "NONE"
+            },
+            "else": {
+              "enabled": "true",
+              "condition": "IsInAttribute(StorageLocation,'3tn_ST22_RR-3-DYNA')",
+              "restrictiontype": "NONE",
+              "then": {
+                "enabled": "true",
+                "action": "900*(Location-35)/10+89*(18-ConvertToDecimal(Row))/2",
+                "restrictiontype": "NONE"
+              },
+              "else": {
+                "enabled": "true",
+                "condition": "IsInAttribute(StorageLocation,'3tn_ST22_RR-4-DYNA')",
+                "restrictiontype": "NONE",
+                "then": {
+                  "enabled": "true",
+                  "action": "900*(108-Location)/63",
+                  "restrictiontype": "NONE"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST22_SB",
+    "ruleid": 106,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST22_SB')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST22_SB-1-STAT')",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*(Location-102)/17-52*(23-ConvertToDecimal(Row))/4",
+            "restrictiontype": "NONE"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST22_SC",
+    "ruleid": 105,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST22_SC')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST22_SC-1-DYNA')",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*(Location-105)/2-449*(20-ConvertToDecimal(Row))/3",
+            "restrictiontype": "NONE"
+          },
+          "else": {
+            "enabled": "true",
+            "condition": "IsInAttribute(StorageLocation,'3tn_ST22_SC-2-DYNA')",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "action": "900*(120-Location)/4+90*(25-ConvertToDecimal(Row))/5",
+              "restrictiontype": "NONE"
+            },
+            "else": {
+              "enabled": "true",
+              "condition": "IsInAttribute(StorageLocation,'3tn_ST22_SC-3-DYNA')",
+              "restrictiontype": "NONE",
+              "then": {
+                "enabled": "true",
+                "action": "900*(Location-80)/21+90*(25-ConvertToDecimal(Row))/5",
+                "restrictiontype": "NONE"
+              },
+              "else": {
+                "enabled": "true",
+                "condition": "IsInAttribute(StorageLocation,'3tn_ST22_SC-4-DYNA')",
+                "restrictiontype": "NONE",
+                "then": {
+                  "enabled": "true",
+                  "action": "900*(31-Location/5)-179*(ConvertToDecimal(Row)-14)/13",
+                  "restrictiontype": "NONE"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST22_TR",
+    "ruleid": 102,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST22_TR')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST22_TR-1-STAT')",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*(103-Location)/80+11*(19-ConvertToDecimal(Row))/4",
+            "restrictiontype": "NONE"
+          },
+          "else": {
+            "enabled": "true",
+            "condition": "IsInAttribute(StorageLocation,'3tn_ST22_TR-2-DYNA')",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "action": "900*(Location-20)/12+74*(ConvertToDecimal(Row)-12)/14",
+              "restrictiontype": "NONE"
+            },
+            "else": {
+              "enabled": "true",
+              "condition": "IsInAttribute(StorageLocation,'3tn_ST22_TR-3-DYNA')",
+              "restrictiontype": "NONE",
+              "then": {
+                "enabled": "true",
+                "action": "900*(60-Location)/24+37*(24-ConvertToDecimal(Row))/5",
+                "restrictiontype": "NONE"
+              },
+              "else": {
+                "enabled": "true",
+                "condition": "IsInAttribute(StorageLocation,'3tn_ST22_TR-4-DYNA')",
+                "restrictiontype": "NONE",
+                "then": {
+                  "enabled": "true",
+                  "action": "900*(Location-59)/43+20*(24-ConvertToDecimal(Row))/5",
+                  "restrictiontype": "NONE"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST22_SP",
+    "ruleid": 103,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST22_SP')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST22_SP-1-STAT')",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*(45-Location)/9+99*(ConvertToDecimal(Row)-22)/2",
+            "restrictiontype": "NONE"
+          },
+          "else": {
+            "enabled": "true",
+            "condition": "IsInAttribute(StorageLocation,'3tn_ST22_SP-2-DYNA')",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "action": "900*(45-Location)/9+99*(ConvertToDecimal(Row)-16)/6",
+              "restrictiontype": "NONE"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_Catch-it-All",
+    "ruleid": 91,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST21_Catch') || Order.Rulename=='' || \r\nOrder.ForeignOrderID > 0\r\n",
+        "restrictiontype": "NONE",
+        "comment": "Lowest distance for those coils",
+        "then": {
+          "enabled": "true",
+          "action": "1000-Distance/100\r\n",
+          "restrictiontype": "NONE",
+          "comment": "Shortest Distance possible"
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_Always-Lower-Layer",
+    "ruleid": 71,
+    "bay": "ST21",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "Order.ForeignOrderID == 0",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "-Layer",
+          "restrictiontype": "NONE"
+        },
+        "else": {
+          "enabled": "true",
+          "action": "+5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "(\r\nContains(Order.OrderCategories,'_BA_')\r\n\r\n)\r\n&&\r\nGetCoilUtilization('21BA') > 95\r\n&&\r\nLayer == 2",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "(\r\nContains(Order.OrderCategories,'_BC_')\r\n)\r\n&&\r\nGetCoilUtilization('21BC') > 95\r\n&&\r\nLayer == 2",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "(\r\nContains(Order.OrderCategories,'_BS_')\r\n)\r\n&&\r\nGetCoilUtilization('21BS') > 95\r\n&&\r\nLayer == 2\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "(\r\nContains(Order.OrderCategories,'_CM_')\r\n)\r\n&&\r\nGetCoilUtilization('21CM') > 95\r\n&&\r\nLayer == 2\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "(\r\nContains(Order.OrderCategories,'_PP_')\r\n)\r\n&&\r\nGetCoilUtilization('21PP') > 95\r\n&&\r\nLayer == 2\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "Contains(Order.OrderCategories,'_QU_')\r\n&&\r\nGetCoilUtilization('21QU') > 95\r\n&&\r\nLayer == 2\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "(\r\nContains(Order.OrderCategories,'_RR_')\r\n)\r\n&&\r\nGetCoilUtilization('21RR') > 95\r\n&&\r\nLayer == 2\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "(\r\nContains(Order.OrderCategories,'_SC_')\r\n)\r\n&&\r\nGetCoilUtilization('21SC') > 95\r\n&&\r\nLayer == 2\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      },
+      {
+        "enabled": "true",
+        "condition": "(\r\nContains(Order.OrderCategories,'_TR_')\r\n)\r\n&&\r\nGetCoilUtilization('21TR') > 95\r\n&&\r\nLayer == 2\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "5000",
+          "restrictiontype": "NONE"
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_Do not put coils on coils with transport order",
+    "ruleid": 92,
+    "bay": "ST21",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "OccupiesAnotherOrder",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "-1000",
+          "restrictiontype": "NONE"
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_Never-L2",
+    "ruleid": 72,
+    "bay": "ST21",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "false",
+        "condition": "Layer==2 && Order.ForeignOrderID ==0",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "restriction": "'Do not use Layer 2'",
+          "restrictiontype": "WEAK"
+        }
+      }
+    ]
+  },
+  {
+    "name": "HankTest",
+    "ruleid": 112,
+    "bay": "ST21",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'Hank')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "2000-Distance/100",
+          "restrictiontype": "NONE"
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST21_BA",
+    "ruleid": 51,
+    "bay": "ST21",
+    "mainarea": "SST2",
+    "color": "rgb(0,128,0)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST21_BA')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST21_BA-1-STAT')\r\n",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*Location/10-89*(11-ConvertToDecimal(Row))/2\r\n",
+            "restrictiontype": "NONE"
+          },
+          "else": {
+            "enabled": "true",
+            "condition": "IsInAttribute(StorageLocation,'3tn_ST21_BA-2-STAT')\r\n",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "action": "900*(23-Location)/10-89*(13-ConvertToDecimal(Row))/2\r\n",
+              "restrictiontype": "NONE"
+            },
+            "else": {
+              "enabled": "true",
+              "condition": "IsInAttribute(StorageLocation,'3tn_ST21_BA-3-DYNA')\r\n",
+              "restrictiontype": "NONE",
+              "then": {
+                "enabled": "true",
+                "action": "900*(ConvertToDecimal(Row)-6)/4-183*Location/12 + 200\r\n",
+                "restrictiontype": "NONE"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST21_BC",
+    "ruleid": 94,
+    "bay": "ST21",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST21_BC')\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST21_BC-1-DYNA')",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*(Location-17)/4-224*(11-ConvertToDecimal(Row))/4",
+            "restrictiontype": "NONE"
+          },
+          "else": {
+            "enabled": "true",
+            "condition": "IsInAttribute(StorageLocation,'3tn_ST21_BC-2-DYNA')",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "action": "900*(Location-55)/6-149*(13-ConvertToDecimal(Row))/5",
+              "restrictiontype": "NONE"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST21_BS",
+    "ruleid": 95,
+    "bay": "ST21",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "(StartsWith(Order.Rulename,'3tn_ST21_BS'))",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST21_BS-1-DYNA')",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*(98-Location)/36-24*(13-ConvertToDecimal(Row))/13",
+            "restrictiontype": "NONE"
+          },
+          "else": {
+            "enabled": "true",
+            "condition": "IsInAttribute(StorageLocation,'3tn_ST21_BS-2-DYNA')",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "action": "900*(Location-31)/30-29*(13-ConvertToDecimal(Row))/5",
+              "restrictiontype": "NONE"
+            },
+            "else": {
+              "enabled": "true",
+              "condition": "IsInAttribute(StorageLocation,'3tn_ST21_BS-3-DYNA')",
+              "restrictiontype": "NONE",
+              "then": {
+                "enabled": "true",
+                "action": "900*(Location-118)/27-33*(13-ConvertToDecimal(Row))/8",
+                "restrictiontype": "NONE"
+              },
+              "else": {
+                "enabled": "true",
+                "condition": "IsInAttribute(StorageLocation,'3tn_ST21_BS-4-DYNA')",
+                "restrictiontype": "NONE",
+                "then": {
+                  "enabled": "true",
+                  "action": "900*(Location-97)/21-42*(13-ConvertToDecimal(Row))/8",
+                  "restrictiontype": "NONE"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST21_CM",
+    "ruleid": 96,
+    "bay": "ST21",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST21_CM')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST21_CM-1-DYNA')",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*(Location-52)/7-128*(ConvertToDecimal(Row)-8)/3",
+            "restrictiontype": "NONE"
+          },
+          "else": {
+            "enabled": "true",
+            "condition": "IsInAttribute(StorageLocation,'3tn_ST21_CM-2-DYNA')",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "action": "900*(Location-52)/7-128*(ConvertToDecimal(Row)-7)/5",
+              "restrictiontype": "NONE"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST21_PP",
+    "ruleid": 97,
+    "bay": "ST21",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST21_PP')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST21_PP-1-STAT')",
+          "restrictiontype": "NONE",
+          "comment": "This Stock Rule handels the Prepackaging Process and here the Static Locations of this process",
+          "then": {
+            "enabled": "true",
+            "action": "900*(Location-31)/9+99*ConvertToDecimal(Row)/7",
+            "restrictiontype": "NONE"
+          },
+          "else": {
+            "enabled": "true",
+            "condition": "IsInAttribute(StorageLocation,'3tn_ST21_PP-2-DYNA')",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "action": "900*(56-Location)/47-20*(ConvertToDecimal(Row))/12",
+              "restrictiontype": "NONE"
+            },
+            "else": {
+              "enabled": "true",
+              "condition": "IsInAttribute(StorageLocation,'3tn_ST21_PP-3-DYNA')",
+              "restrictiontype": "NONE",
+              "then": {
+                "enabled": "true",
+                "action": "900*Location/22-29*ConvertToDecimal(Row)/12",
+                "restrictiontype": "NONE"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST21_QU",
+    "ruleid": 101,
+    "bay": "ST21",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST21_QU')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST21QU-1-STAT')",
+          "restrictiontype": "NONE",
+          "comment": "Target shall be Quaiity Hold placed at the edge of the bay to be accesible",
+          "then": {
+            "enabled": "true",
+            "action": "900*(32-Location)/24",
+            "restrictiontype": "NONE"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST21_RR",
+    "ruleid": 98,
+    "bay": "ST21",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST21_RR')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST21_RR-1-STAT')",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*(146-Location)/81-11*(ConvertToDecimal(Row)-6)/5",
+            "restrictiontype": "NONE"
+          },
+          "else": {
+            "enabled": "true",
+            "condition": "IsInAttribute(StorageLocation,'3tn_ST21_RR-2-DYNA')",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "action": "900*(146-Location)/81-11*(ConvertToDecimal(Row)-5)/4",
+              "restrictiontype": "NONE"
+            },
+            "else": {
+              "enabled": "true",
+              "condition": "IsInAttribute(StorageLocation,'3tn_ST21_RR-3-DYNA')",
+              "restrictiontype": "NONE",
+              "then": {
+                "enabled": "true",
+                "action": "900*(146-Location)/81-11*(ConvertToDecimal(Row)-4)/8",
+                "restrictiontype": "NONE"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST21_SC",
+    "ruleid": 99,
+    "bay": "ST21",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST21_SC')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST21_SC-1-DYNA')",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*(Location-102)/18-100*(25-ConvertToDecimal(Row))/5",
+            "restrictiontype": "NONE"
+          },
+          "else": {
+            "enabled": "true",
+            "condition": "IsInAttribute(StorageLocation,'3tn_ST21_SC-2-DYNA')",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "action": "900*(Location-133)/10+90*(12-ConvertToDecimal(Row))/6",
+              "restrictiontype": "NONE"
+            },
+            "else": {
+              "enabled": "true",
+              "condition": "IsInAttribute(StorageLocation,'3tn_ST21_SC-3-DYNA')",
+              "restrictiontype": "NONE",
+              "then": {
+                "enabled": "true",
+                "action": "900*(Location-132)/14+90*(10-ConvertToDecimal(Row))/6",
+                "restrictiontype": "NONE"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST21_TR",
+    "ruleid": 100,
+    "bay": "ST21",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST21_RR')",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "condition": "IsInAttribute(StorageLocation,'3tn_ST21_TR-1-STAT')",
+          "restrictiontype": "NONE",
+          "then": {
+            "enabled": "true",
+            "action": "900*(134-Location)/72+12*(10-ConvertToDecimal(Row))/5",
+            "restrictiontype": "NONE"
+          },
+          "else": {
+            "enabled": "true",
+            "condition": "IsInAttribute(StorageLocation,'3tn_ST21_TR-2-DYNA')",
+            "restrictiontype": "NONE",
+            "then": {
+              "enabled": "true",
+              "action": "900*(98-Location)/33+30*(11-ConvertToDecimal(Row))/4",
+              "restrictiontype": "NONE"
+            },
+            "else": {
+              "enabled": "true",
+              "condition": "IsInAttribute(StorageLocation,'3tn_ST21_TR-3-DYNA')\r\n",
+              "restrictiontype": "NONE",
+              "then": {
+                "enabled": "true",
+                "action": "900*(Location-31)/23+39*(11-ConvertToDecimal(Row))/5",
+                "restrictiontype": "NONE"
+              },
+              "else": {
+                "enabled": "true",
+                "condition": "IsInAttribute(StorageLocation,'3tn_ST22_TR-4-DYNA')",
+                "restrictiontype": "NONE",
+                "then": {
+                  "enabled": "true",
+                  "action": "900*(Location-97)/48+18*(11-ConvertToDecimal(Row))/4",
+                  "restrictiontype": "NONE"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "3tn_ST21_Catch-It-All",
+    "ruleid": 87,
+    "bay": "ST21",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)",
+    "enabled": "true",
+    "rules": [
+      {
+        "enabled": "true",
+        "condition": "StartsWith(Order.Rulename,'3tn_ST21_Catch') || \r\nOrder.Rulename=='' || \r\nOrder.ForeignOrderID > 0\r\n\r\n",
+        "restrictiontype": "NONE",
+        "then": {
+          "enabled": "true",
+          "action": "1000-Distance/100",
+          "restrictiontype": "NONE",
+          "comment": "Selects the free location purely due to distance from the crane."
+        }
+      }
+    ]
+  }
+]

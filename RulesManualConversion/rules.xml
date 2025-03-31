@@ -1,0 +1,202 @@
+<Rules>
+<Element>
+  <Enabled>true</Enabled>
+  <Condition>CurrentDestination.Attribute == '3tn_ST22_SB-1-STAT' ||
+
+Order.ForeignOrderID &gt; 0</Condition>
+  <Then>
+    <Element>
+      <Enabled>true</Enabled>
+      <Action>+5000</Action>
+      <RestrictionType>NONE</RestrictionType>
+    </Element>
+  </Then>
+  <Else>
+    <Element>
+      <Enabled>true</Enabled>
+      <Action>-Layer</Action>
+      <RestrictionType>NONE</RestrictionType>
+    </Element>
+  </Else>
+  <RestrictionType>NONE</RestrictionType>
+</Element><Element>
+  <Enabled>true</Enabled>
+  <Condition>Contains(Order.OrderCategories,'_PP_')
+&amp;&amp;
+GetCoilUtilization('22PP') &gt; 95
+&amp;&amp;
+Layer==2</Condition>
+  <Then>
+    <Element>
+      <Enabled>true</Enabled>
+      <Action>5000</Action>
+      <RestrictionType>NONE</RestrictionType>
+    </Element>
+  </Then>
+  <Else />
+  <RestrictionType>NONE</RestrictionType>
+</Element><Element>
+  <Enabled>true</Enabled>
+  <Condition>(
+Contains(Order.OrderCategories,'_BC_')
+)
+&amp;&amp;
+GetCoilUtilization('22BC') &gt; 95
+&amp;&amp;
+Layer == 2</Condition>
+  <Then>
+    <Element>
+      <Enabled>true</Enabled>
+      <Action>5000</Action>
+      <RestrictionType>NONE</RestrictionType>
+    </Element>
+  </Then>
+  <Else />
+  <RestrictionType>NONE</RestrictionType>
+</Element><Element>
+  <Enabled>true</Enabled>
+  <Condition>Contains(Order.OrderCategories,'_BS_')
+&amp;&amp;
+GetCoilUtilization('22BS') &gt; 95
+&amp;&amp;
+Layer == 2</Condition>
+  <Then>
+    <Element>
+      <Enabled>true</Enabled>
+      <Action>5000</Action>
+      <RestrictionType>NONE</RestrictionType>
+    </Element>
+  </Then>
+  <Else />
+  <RestrictionType>NONE</RestrictionType>
+</Element><Element>
+  <Enabled>true</Enabled>
+  <Condition>Contains(Order.OrderCategories,'_QU_')
+&amp;&amp;
+GetCoilUtilization('22QU') &gt; 95
+&amp;&amp;
+Layer == 2
+</Condition>
+  <Then>
+    <Element>
+      <Enabled>true</Enabled>
+      <Action>5000
+</Action>
+      <RestrictionType>NONE</RestrictionType>
+    </Element>
+  </Then>
+  <Else />
+  <RestrictionType>NONE</RestrictionType>
+</Element><Element>
+  <Enabled>true</Enabled>
+  <Condition>(
+Contains(Order.OrderCategories,'_RR_')
+)
+&amp;&amp;
+GetCoilUtilization('22RR') &gt; 95
+&amp;&amp;
+Layer == 2
+</Condition>
+  <Then>
+    <Element>
+      <Enabled>true</Enabled>
+      <Action>5000</Action>
+      <RestrictionType>NONE</RestrictionType>
+    </Element>
+  </Then>
+  <Else />
+  <RestrictionType>NONE</RestrictionType>
+</Element><Element>
+  <Enabled>true</Enabled>
+  <Condition>Contains(Order.OrderCategories,'_SB_')
+&amp;&amp;
+GetCoilUtilization('22SB') &gt; 95
+&amp;&amp;
+Layer == 2
+</Condition>
+  <Then>
+    <Element>
+      <Enabled>true</Enabled>
+      <Action>5000</Action>
+      <RestrictionType>NONE</RestrictionType>
+    </Element>
+  </Then>
+  <Else />
+  <RestrictionType>NONE</RestrictionType>
+</Element><Element>
+  <Enabled>true</Enabled>
+  <Condition>(
+Contains(Order.OrderCategories,'_SC_')
+)
+&amp;&amp;
+GetCoilUtilization('22SC') &gt; 95
+&amp;&amp;
+Layer == 2
+</Condition>
+  <Then>
+    <Element>
+      <Enabled>true</Enabled>
+      <Action>5000</Action>
+      <RestrictionType>NONE</RestrictionType>
+    </Element>
+  </Then>
+  <Else />
+  <RestrictionType>NONE</RestrictionType>
+</Element><Element>
+  <Enabled>true</Enabled>
+  <Condition>(
+Contains(Order.OrderCategories,'_SL_')
+)
+&amp;&amp;
+GetCoilUtilization('22SL') &gt; 95
+&amp;&amp;
+Layer == 2
+</Condition>
+  <Then>
+    <Element>
+      <Enabled>true</Enabled>
+      <Action>5000</Action>
+      <RestrictionType>NONE</RestrictionType>
+    </Element>
+  </Then>
+  <Else />
+  <RestrictionType>NONE</RestrictionType>
+</Element><Element>
+  <Enabled>true</Enabled>
+  <Condition>(
+Contains(Order.OrderCategories,'_SP_')
+)
+&amp;&amp;
+GetCoilUtilization('22SP') &gt; 95
+&amp;&amp;
+Layer == 2
+</Condition>
+  <Then>
+    <Element>
+      <Enabled>true</Enabled>
+      <Action>5000</Action>
+      <RestrictionType>NONE</RestrictionType>
+    </Element>
+  </Then>
+  <Else />
+  <RestrictionType>NONE</RestrictionType>
+</Element><Element>
+  <Enabled>true</Enabled>
+  <Condition>(
+Contains(Order.OrderCategories,'_TR_')
+)
+&amp;&amp;
+GetCoilUtilization('22TR') &gt; 95
+&amp;&amp;
+Layer == 2
+</Condition>
+  <Then>
+    <Element>
+      <Enabled>true</Enabled>
+      <Action>5000</Action>
+      <RestrictionType>NONE</RestrictionType>
+    </Element>
+  </Then>
+  <Else />
+  <RestrictionType>NONE</RestrictionType>
+</Element></Rules>

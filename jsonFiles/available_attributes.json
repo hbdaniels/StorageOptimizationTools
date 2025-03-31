@@ -1,0 +1,77 @@
+{"results":[{"columns":[{"name":"ATTRIBUTE","type":"VARCHAR2"},{"name":"ID","type":"NUMBER"},{"name":"DESCRIPTION","type":"VARCHAR2"},{"name":"USER_RESTRICTION","type":"VARCHAR2"}],"items":
+[
+{"attribute":"3tn_ST22_SL-2-DYNA","id":18,"description":"Slitting Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_BA-2-STAT","id":20,"description":"Batch Annealing Static","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_PP-2-DYNA","id":22,"description":"Pre Pack \/ Pack Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_BC-2-DYNA","id":24,"description":"Bay Change Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_BC-2-DYNA","id":26,"description":"Bay Change Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_CM-1-DYNA","id":27,"description":"Coilmaster Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_BS-4-DYNA","id":31,"description":"Barge Staging Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_BS-1-DYNA","id":32,"description":"Barge Staging Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_SB-1-STAT","id":38,"description":"Bulk Scrap Static","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_RR-1-STAT","id":40,"description":"Railroad Static","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_RR-2-DYNA","id":41,"description":"Railroad Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_RR-3-DYNA","id":42,"description":"Railroad Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_TR-1-STAT","id":47,"description":"Truck Static","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_TR-2-DYNA","id":48,"description":"Truck Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_TR-3-DYNA","id":53,"description":"Truck Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_PP_Entry","id":56,"description":"All Locatioms with Prepackaging Entry","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_SC3-DYNA","id":81,"description":"Scrap Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_CM_Entry","id":67,"description":"Coilmaster Entry","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_CM_Exit","id":68,"description":"Coilmaster Exit Area","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_BA_Exit","id":73,"description":"Exit Area from Batch Annealing","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_PP_Exit","id":74,"description":"Attribut for Packaging Exit Area","user_restriction":"NONE"}
+,{"attribute":"CAPS","id":83,"description":"Batch Annealing Sockets","user_restriction":"NONE"}
+,{"attribute":"SESCC","id":84,"description":"SESCC Conveyor System","user_restriction":"NONE"}
+,{"attribute":"_BA_Entry","id":87,"description":"Tempary Solution for Batch Annealing","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_BC-1-DYNA","id":23,"description":"Bay Change Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_BC-1-DYNA","id":25,"description":"Bay Change Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_BS-1-DYNA","id":28,"description":"Barge Staging Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_BS-2-DYNA","id":29,"description":"Barge Staging Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_BS-3-DYNA","id":30,"description":"Barge Staging Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_PP_Exit","id":69,"description":"Prepackaging Exit when Packaging is done","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_PP-1-DYNA","id":70,"description":"Pack \/ Pre Pack Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_CM-2-DYNA","id":71,"description":"Coilmaster Dynamic","user_restriction":"NONE"}
+,{"attribute":"_SLH_Banding","id":85,"description":"Temporary for Slitting Operation","user_restriction":"NONE"}
+,{"attribute":"Hauptlager","id":1,"description":"Warehouse","user_restriction":"DELETE"}
+,{"attribute":"3tn_ST22_QU-1-STAT","id":16,"description":"Quarantine Static","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_BA-1-STAT","id":19,"description":"Batch Annealing Static","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_QU-1-STAT","id":15,"description":"Quarantine Static","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_PP-1-STAT","id":21,"description":"Pre Pack \/ Pack Static","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_SP-1-STAT","id":39,"description":"Scale Static","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_TR-1-STAT","id":51,"description":"Truck Static","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_TR-2-DYNA","id":52,"description":"Truck Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_TR-4-DYNA","id":54,"description":"Truck Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_BA_Entry","id":57,"description":"Entry Area for Batch Annealing","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_SP-2-DYNA","id":61,"description":"Scale Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_SL_Entry_Proc","id":62,"description":"Entry Area for the Slitting Line Process","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_SL_Exit","id":63,"description":"Exit Area fpr Slitting Line Process","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_SP_Exit","id":78,"description":"Attribut for weighnh Exit","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_SC-4-DYNA","id":66,"description":"Scrap Dynamic, Temporary Before Final Destination","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_Loadstation","id":76,"description":"Truck Loading Zones ST22","user_restriction":"NONE"}
+,{"attribute":"_SLH_Entry","id":86,"description":"Temporary for Slitting Operation","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_RR-1-STAT","id":43,"description":"Railroad Static","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_RR-2-DYNA","id":44,"description":"Railroad Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_RR-3-DYNA","id":45,"description":"Railroad Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_RR-4-DYNA","id":46,"description":"Railroad Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_TR-3-DYNA","id":49,"description":"Truck Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_TR-4-DYNA","id":50,"description":"Truck Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_BA-3-DYNA","id":58,"description":"Batch Annealing Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_Loadstation","id":59,"description":"Truck Loading Zones ST22","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_PP_Entry","id":72,"description":"Attribute for enty area in packaging.","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_SP_Entry","id":75,"description":"Entry Area of scale station","user_restriction":"NONE"}
+,{"attribute":"CPL-Exit","id":82,"description":"CPL-Exit Saddles","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_SL-1-STAT","id":17,"description":"Slitting Static","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_SC-1-DYNA","id":33,"description":"Scrap Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_SC-2-DYNA","id":34,"description":"Scrap Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_SC-1-DYNA","id":35,"description":"Scrap Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_SC-2-DYNA","id":36,"description":"Scrap Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_SC-3-DYNA","id":37,"description":"Scrap Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_CPL_Exit","id":55,"description":"Contains the CPL Exit Locations","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_PP-3-DYNA","id":60,"description":"Pre Pack \/ Pack Dynamic","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_SL_Entry_Band","id":77,"description":"Attribut for SH Entry Band Removal","user_restriction":"NONE"}
+,{"attribute":"3tn_ST21_RR_Entry","id":79,"description":"Attribiute for Railcar Delivery","user_restriction":"NONE"}
+,{"attribute":"3tn_ST22_RR_Entry","id":80,"description":"Attribute for Railrcar Delivery","user_restriction":"NONE"}
+,{"attribute":"Hank","id":88,"description":"Hanks Attribute","user_restriction":"NONE"}
+,{"attribute":"Q-Coil","id":89,"description":"Quality Inspection Coil","user_restriction":"NONE"}
+]}]}

@@ -1,0 +1,149 @@
+[
+  {
+    "enabled": "true",
+    "condition": "StartsWith(Order.Rulename,'3tn_ST22_BC')",
+    "then": {
+      "enabled": "true",
+      "condition": "IsInAttribute(StorageLocation,'3tn_ST22_BC-1-DYNA')",
+      "then": {
+        "enabled": "true",
+        "action": "900*(Location-19)/3-299*(19-ConvertToDecimal(Row))/7",
+        "restrictiontype": "NONE"
+      },
+      "else": {
+        "enabled": "true",
+        "condition": "IsInAttribute(StorageLocation,'3tn_ST22_BC-2-DYNA')",
+        "then": {
+          "enabled": "true",
+          "action": "900*(Location-29)/6-149*(27-ConvertToDecimal(Row))/14",
+          "restrictiontype": "NONE"
+        },
+        "else": null,
+        "restrictiontype": "NONE"
+      },
+      "restrictiontype": "NONE"
+    },
+    "else": null,
+    "restrictiontype": "NONE",
+    "name": "3tn_ST22_BC",
+    "ruleid": 107,
+    "bay": "ST22",
+    "mainarea": "SST2",
+    "color": "rgb(178,34,34)"
+  },
+  {
+    "enabled": "true",
+    "condition": "CurrentDestination.Attribute == '3tn_ST22_SB-1-STAT' ||\r\n\r\nOrder.ForeignOrderID > 0",
+    "restrictiontype": "NONE",
+    "then": {
+      "enabled": "true",
+      "action": "+5000",
+      "restrictiontype": "NONE"
+    },
+    "else": {
+      "enabled": "true",
+      "action": "-Layer",
+      "restrictiontype": "NONE"
+    }
+  },
+  {
+    "enabled": "true",
+    "condition": "Contains(Order.OrderCategories,'_PP_')\r\n&&\r\nGetCoilUtilization('22PP') > 95\r\n&&\r\nLayer==2",
+    "restrictiontype": "NONE",
+    "then": {
+      "enabled": "true",
+      "action": "5000",
+      "restrictiontype": "NONE"
+    }
+  },
+  {
+    "enabled": "true",
+    "condition": "(\r\nContains(Order.OrderCategories,'_BC_')\r\n)\r\n&&\r\nGetCoilUtilization('22BC') > 95\r\n&&\r\nLayer == 2",
+    "restrictiontype": "NONE",
+    "then": {
+      "enabled": "true",
+      "action": "5000",
+      "restrictiontype": "NONE"
+    }
+  },
+  {
+    "enabled": "true",
+    "condition": "Contains(Order.OrderCategories,'_BS_')\r\n&&\r\nGetCoilUtilization('22BS') > 95\r\n&&\r\nLayer == 2",
+    "restrictiontype": "NONE",
+    "then": {
+      "enabled": "true",
+      "action": "5000",
+      "restrictiontype": "NONE"
+    }
+  },
+  {
+    "enabled": "true",
+    "condition": "Contains(Order.OrderCategories,'_QU_')\r\n&&\r\nGetCoilUtilization('22QU') > 95\r\n&&\r\nLayer == 2\r\n",
+    "restrictiontype": "NONE",
+    "then": {
+      "enabled": "true",
+      "action": "5000\r\n",
+      "restrictiontype": "NONE"
+    }
+  },
+  {
+    "enabled": "true",
+    "condition": "(\r\nContains(Order.OrderCategories,'_RR_')\r\n)\r\n&&\r\nGetCoilUtilization('22RR') > 95\r\n&&\r\nLayer == 2\r\n",
+    "restrictiontype": "NONE",
+    "then": {
+      "enabled": "true",
+      "action": "5000",
+      "restrictiontype": "NONE"
+    }
+  },
+  {
+    "enabled": "true",
+    "condition": "Contains(Order.OrderCategories,'_SB_')\r\n&&\r\nGetCoilUtilization('22SB') > 95\r\n&&\r\nLayer == 2\r\n",
+    "restrictiontype": "NONE",
+    "then": {
+      "enabled": "true",
+      "action": "5000",
+      "restrictiontype": "NONE"
+    }
+  },
+  {
+    "enabled": "true",
+    "condition": "(\r\nContains(Order.OrderCategories,'_SC_')\r\n)\r\n&&\r\nGetCoilUtilization('22SC') > 95\r\n&&\r\nLayer == 2\r\n",
+    "restrictiontype": "NONE",
+    "then": {
+      "enabled": "true",
+      "action": "5000",
+      "restrictiontype": "NONE"
+    }
+  },
+  {
+    "enabled": "true",
+    "condition": "(\r\nContains(Order.OrderCategories,'_SL_')\r\n)\r\n&&\r\nGetCoilUtilization('22SL') > 95\r\n&&\r\nLayer == 2\r\n",
+    "restrictiontype": "NONE",
+    "then": {
+      "enabled": "true",
+      "action": "5000",
+      "restrictiontype": "NONE"
+    }
+  },
+  {
+    "enabled": "true",
+    "condition": "(\r\nContains(Order.OrderCategories,'_SP_')\r\n)\r\n&&\r\nGetCoilUtilization('22SP') > 95\r\n&&\r\nLayer == 2\r\n",
+    "restrictiontype": "NONE",
+    "then": {
+      "enabled": "true",
+      "action": "5000",
+      "restrictiontype": "NONE"
+    }
+  },
+  {
+    "enabled": "true",
+    "condition": "(\r\nContains(Order.OrderCategories,'_TR_')\r\n)\r\n&&\r\nGetCoilUtilization('22TR') > 95\r\n&&\r\nLayer == 2\r\n",
+    "restrictiontype": "NONE",
+    "then": {
+      "enabled": "true",
+      "action": "5000",
+      "restrictiontype": "NONE"
+    }
+  }
+]
