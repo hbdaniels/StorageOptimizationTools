@@ -7,6 +7,18 @@ import parsedRules from "../jsonFiles/parsed_storage_rules.json";
 import { DropShadowFilter } from '@pixi/filter-drop-shadow';
 import chroma from "chroma-js";
 import loadingStations from "../jsonFiles/storagelocation_loadingstation.json";
+import { initCanvas } from './canvas/initCanvas.js';
+
+const {
+  app,
+  viewport,
+  zoomScale,
+  layer1Container,
+  layer2Container,
+  labelLayer,
+  shopFloorContainer,
+  attributeUnderlay
+} = await initCanvas();
 
 const colorScale = chroma.scale(['#FF0000', '#FFFF00', '#00FF00']).domain([0, 1000]);
 
@@ -17,36 +29,10 @@ console.log(rackrow_subs);
 const storedColors = JSON.parse(localStorage.getItem("attributeColors") || "{}");
 const visibleAttributes = new Set();
 
-const app = new PIXI.Application({
-    width: 1200,
-    height: 800,
-    antialias: true,
-});
-
-
-await app.init();
-app.renderer.background.color = 0xdbedff;
-document.body.appendChild(app.canvas);
-
 const selector = document.getElementById("ruleSelector");
 window.ruleSelector = selector; // 👈 attach to global window object
 
-const viewport = new PIXI.Container();
 
-const worldScale = 0.002;
-viewport.scale.set(worldScale);
-const shopFloorContainer = new PIXI.Container();
-viewport.addChild(shopFloorContainer); // after viewport is created
-const layer1Container = new PIXI.Container();
-viewport.addChild(layer1Container); // after viewport is created
-const layer2Container = new PIXI.Container();
-viewport.addChild(layer2Container); // after viewport is created
-const attributeUnderlay = new PIXI.Container();
-viewport.addChild(attributeUnderlay); // after viewport is created
-
-const labelLayer = new PIXI.Container();
-
-let zoomScale = 0.002;
 let labelsVisible = false;
 let previousZoom = zoomScale;
 
