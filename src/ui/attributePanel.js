@@ -65,6 +65,7 @@ export function renderAttributePanel({
           
           checkAll.addEventListener("change", (e) => {
             const isChecked = e.target.checked;
+            
             attrs.forEach(({ id }) => {
               const cb = document.getElementById(`attr-${id}`);
               if (cb) {
@@ -102,9 +103,10 @@ export function renderAttributePanel({
             checkbox.dataset.attrId = id;
       
             checkbox.addEventListener("change", (e) => {
-              const attrId = parseInt(e.target.dataset.attrId);
-              onToggleAttribute(attrId, e.target.checked);
-            });
+                const attrId = parseInt(e.target.dataset.attrId);
+                onToggleAttribute(attrId, e.target.checked); // ✅ this is the boolean value
+              });
+              
       
             const label = document.createElement("label");
             label.htmlFor = checkbox.id;
@@ -114,6 +116,7 @@ export function renderAttributePanel({
             const colorInput = document.createElement("input");
             colorInput.type = "color";
             colorInput.value = color;
+            colorInput.dataset.attrId = id
       
             colorInput.addEventListener("input", (e) => {
               const newColor = e.target.value;
