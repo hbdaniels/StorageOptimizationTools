@@ -30,6 +30,7 @@ export function drawRackRows(rack, texture, attrHandler, locationMap, labelMeta,
     sprite.y = rowY;
     sprite.width = locWidth - 200;
     sprite.height = height;
+    //test
 
     const attrList = attrHandler.attributeMap.get(locKey);
     if (attrList && attrList.length > 0) {
