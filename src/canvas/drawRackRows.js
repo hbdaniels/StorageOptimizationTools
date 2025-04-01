@@ -1,9 +1,7 @@
 // drawRackRows.js
 import * as PIXI from "pixi.js";
 
-
-
-export function drawRackRows(rack, texture, attrHandler, locationMap, labelMeta, onClick, container) {
+export function drawRackRows(rack, texture, attrHandler, locationMap, labelMeta, onClick, layer1Container, layer2Container) {
   const startX = parseFloat(rack.location1coord);
   const endX = parseFloat(rack.locationncoord);
   const rowY = parseFloat(rack.rowcoord);
@@ -24,25 +22,24 @@ export function drawRackRows(rack, texture, attrHandler, locationMap, labelMeta,
   const x0 = endX;
 
   for (let i = 0; i < locCount; i++) {
-    const locKey = `${rack.bay}-${rack.area}-${rack.rowname}-${parseInt(rack.to_location) - i}`;
+    const baseIndex = parseInt(rack.to_location) - i;
+    const baseKey = `${rack.bay}-${rack.area}-${rack.rowname}-${baseIndex}`;
+    const locKey = `${baseKey}-1`; // Layer 1
     const sprite = new PIXI.Sprite(texture);
     sprite.x = x0 + i * locWidth;
     sprite.y = rowY;
     sprite.width = locWidth - 200;
     sprite.height = height;
-    //test
 
-    const attrList = attrHandler.attributeMap.get(locKey);
-    if (attrList && attrList.length > 0) {
-      sprite.attributes = attrList.map(attr => {
-        const meta = attrHandler.attributeMeta.get(attr.attributeId);
-        return {
-          id: attr.attributeId,
-          name: meta?.name || `Attribute ${attr.attributeId}`,
-          description: meta?.description || ""
-        };
-      });
-    }
+    const attrList = attrHandler.attributeMap.get(baseKey);
+    sprite.attributes = attrList?.map(attr => {
+      const meta = attrHandler.attributeMeta.get(attr.attributeId);
+      return {
+        id: attr.attributeId,
+        name: meta?.name || `Attribute ${attr.attributeId}`,
+        description: meta?.description || ""
+      };
+    }) || [];
 
     locationMap.set(locKey, sprite);
     sprite.locationKey = locKey;
@@ -50,10 +47,44 @@ export function drawRackRows(rack, texture, attrHandler, locationMap, labelMeta,
     sprite.cursor = "pointer";
     sprite.on("pointerdown", () => onClick(sprite));
 
-    container.addChild(sprite);
+    layer1Container.addChild(sprite);
 
     if (i === 0) firstSprite = sprite;
     if (i === locCount - 1) lastSprite = sprite;
+  }
+
+  // Layer 2 - skip first and last position
+  for (let i = 1; i < locCount - 2; i++) {
+    const leftIndex = parseInt(rack.to_location) - i;
+    const rightIndex = parseInt(rack.to_location) - (i + 1);
+    const baseKey = `${rack.bay}-${rack.area}-${rack.rowname}-${rightIndex}`;
+    const locKey = `${baseKey}-2`; // Layer 2 key
+    const sprite = new PIXI.Sprite(texture);
+    const xLeft = x0 + i * locWidth;
+    const xRight = x0 + (i + 1) * locWidth;
+    sprite.x = (xLeft + xRight) / 2;
+    sprite.y = rowY;
+    sprite.width = locWidth - 300;
+    sprite.height = height;
+    sprite.alpha = 0.7; // Visual distinction
+
+    const attrList = attrHandler.attributeMap.get(baseKey);
+    sprite.attributes = attrList?.map(attr => {
+      const meta = attrHandler.attributeMeta.get(attr.attributeId);
+      return {
+        id: attr.attributeId,
+        name: meta?.name || `Attribute ${attr.attributeId}`,
+        description: meta?.description || ""
+      };
+    }) || [];
+
+    locationMap.set(locKey, sprite);
+    sprite.locationKey = locKey;
+    sprite.eventMode = "static";
+    sprite.cursor = "pointer";
+    sprite.on("pointerdown", () => onClick(sprite));
+
+    layer2Container.addChild(sprite);
   }
 
   if (firstSprite && lastSprite) {

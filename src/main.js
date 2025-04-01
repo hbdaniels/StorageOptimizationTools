@@ -286,6 +286,7 @@ app.ticker.add(() => {
         rowLabelMeta,
         locationMap,
         labelLayer,
+        layer2Container,
         zoomScale: zoomScale.value
       });
     } else {
@@ -729,7 +730,8 @@ async function main() {
       locationMap,
       rowLabelMeta,
       spriteOnClick,
-      layer1Container
+      layer1Container,
+      layer2Container 
     );
   });
   // rackrow_subs.forEach(rack => {
@@ -793,6 +795,7 @@ async function main() {
             rowLabelMeta,
             locationMap,
             labelLayer,
+            layer2Container,
             zoomScale: zoomScale.value
           })
         
