@@ -9,6 +9,9 @@ import chroma from "chroma-js";
 import loadingStations from "../jsonFiles/storagelocation_loadingstation.json";
 import { initCanvas } from './canvas/initCanvas.js';
 import { drawRackRows } from './canvas/drawRackRows.js';
+import { renderBitmapLabels } from './canvas/renderBitmapLabels.js';
+import { runHeatmap } from "./canvas/heatmap.js";
+
 
 const {
   app,
@@ -218,58 +221,58 @@ function createLabelCenteredInSprite(text, sprite, fontSize = 1000) {
   
   
   
-function renderBitmapLabels() {
-    labelLayer.removeChildren();
+// function renderBitmapLabels() {
+//     labelLayer.removeChildren();
   
-    if (zoomScale.value > 0.0075) {
+//     if (zoomScale.value > 0.0075) {
   
-        rowLabelMeta.forEach(meta => {
-          const label = new PIXI.BitmapText({
-            text: meta.text,
-            style: {
-              fontName: "Roboto Mono SemiBold", // match your .fnt name
-              fontSize: 600,
-            }
-          });
+//         rowLabelMeta.forEach(meta => {
+//           const label = new PIXI.BitmapText({
+//             text: meta.text,
+//             style: {
+//               fontName: "Roboto Mono SemiBold", // match your .fnt name
+//               fontSize: 600,
+//             }
+//           });
       
-          label.x = meta.x;
-          if (zoomScale.value > 0.015 && (meta.type === "start" || meta.type === "end")) {
-            label.y = meta.y - 1000;
-          } else {
-            label.y = meta.y;
-          }
-          label.scale.x = -1; // mirror to match flipped canvas
-          labelLayer.addChild(label);
-          label.tint = 0x000000;
-        });
-    }
+//           label.x = meta.x;
+//           if (zoomScale.value > 0.015 && (meta.type === "start" || meta.type === "end")) {
+//             label.y = meta.y - 1000;
+//           } else {
+//             label.y = meta.y;
+//           }
+//           label.scale.x = -1; // mirror to match flipped canvas
+//           labelLayer.addChild(label);
+//           label.tint = 0x000000;
+//         });
+//     }
 
-    if (zoomScale.value > 0.015) {
-        locationMap.forEach((sprite, key) => {
-         // 🔥 Render heat score labels 
-         if (sprite.heatScore == null || isNaN(sprite.heatScore)) return;
-          const heatLabel = new PIXI.BitmapText({
-            text: Math.round(sprite.heatScore).toString(),
-            style: {
-              fontName: "Roboto Mono SemiBold",
-              fontSize: 400,
-            }
-          });
+//     if (zoomScale.value > 0.015) {
+//         locationMap.forEach((sprite, key) => {
+//          // 🔥 Render heat score labels 
+//          if (sprite.heatScore == null || isNaN(sprite.heatScore)) return;
+//           const heatLabel = new PIXI.BitmapText({
+//             text: Math.round(sprite.heatScore).toString(),
+//             style: {
+//               fontName: "Roboto Mono SemiBold",
+//               fontSize: 400,
+//             }
+//           });
       
-          heatLabel.x = sprite.x + sprite.width / 2;
-          heatLabel.y = sprite.y + sprite.height / 2;
-          heatLabel.anchor = { x: 0.5, y: 0.5 };
-          heatLabel.scale.x = -1; // flip
-          heatLabel.tint = 0x000000;
-          labelLayer.addChild(heatLabel);
+//           heatLabel.x = sprite.x + sprite.width / 2;
+//           heatLabel.y = sprite.y + sprite.height / 2;
+//           heatLabel.anchor = { x: 0.5, y: 0.5 };
+//           heatLabel.scale.x = -1; // flip
+//           heatLabel.tint = 0x000000;
+//           labelLayer.addChild(heatLabel);
       
 
-        console.log("✅ Rendered heat score labels.");
+//         console.log("✅ Rendered heat score labels.");
         
-        });
-    }
+//         });
+//     }
 
-  }
+//   }
   app.ticker.add(() => {
     const shouldShow = zoomScale.value >= 0.0075;
   
@@ -279,7 +282,7 @@ function renderBitmapLabels() {
       previousZoom = zoomScale.value;
   
       if (labelsVisible) {
-        renderBitmapLabels(); // render only once
+        renderBitmapLabels(rowLabelMeta, locationMap, labelLayer, zoomScale);
       } else {
         labelLayer.removeChildren(); // hide all
       }
@@ -610,50 +613,50 @@ function toggleAttributeVisibility(attrId, visible) {
   }
 
 
-  function runHeatmap(rules, ruleName = "Unknown", color = 0xff0000) {
-    if (!heatmapEnabled) return;
-    let minScore = Infinity;
-    let maxScore = -Infinity;
+  // function runHeatmap(rules, ruleName = "Unknown", color = 0xff0000) {
+  //   if (!heatmapEnabled) return;
+  //   let minScore = Infinity;
+  //   let maxScore = -Infinity;
   
-    locationMap.forEach(sprite => {
-      const [bay, area, row, loc] = sprite.locationKey.split("-");
-      const context = {
-        StorageLocation: sprite,
-        Row: row,
-        Location: parseInt(loc),
-        Order: { Rulename: ruleName }
-      };
+  //   locationMap.forEach(sprite => {
+  //     const [bay, area, row, loc] = sprite.locationKey.split("-");
+  //     const context = {
+  //       StorageLocation: sprite,
+  //       Row: row,
+  //       Location: parseInt(loc),
+  //       Order: { Rulename: ruleName }
+  //     };
       
   
-      let score = 0;
-      for (const rule of rules) {
-        const result = evaluateRule(rule, context);
-        if (typeof result === "number") {
-          score += result;
-        }
-      }
+  //     let score = 0;
+  //     for (const rule of rules) {
+  //       const result = evaluateRule(rule, context);
+  //       if (typeof result === "number") {
+  //         score += result;
+  //       }
+  //     }
   
-      if (score !== 0) {
-        sprite.heatScore = score;
-        minScore = Math.min(minScore, score);
-        maxScore = Math.max(maxScore, score);
-      } else {
-        sprite.heatScore = null;
-      }
-    });
+  //     if (score !== 0) {
+  //       sprite.heatScore = score;
+  //       minScore = Math.min(minScore, score);
+  //       maxScore = Math.max(maxScore, score);
+  //     } else {
+  //       sprite.heatScore = null;
+  //     }
+  //   });
   
-    // Apply colors
-    locationMap.forEach(sprite => {
-      if (sprite.heatScore != null) {
-        const t = (sprite.heatScore - minScore) / (maxScore - minScore + 0.0001);
-        //sprite.tint = heatColor(t);
-        sprite.tint = parseInt(colorScale(sprite.heatScore).hex().substring(1), 16);
-      } else {
-        sprite.tint = 0xcccccc;
-      }
-    });
-    renderBitmapLabels();
-  }
+  //   // Apply colors
+  //   locationMap.forEach(sprite => {
+  //     if (sprite.heatScore != null) {
+  //       const t = (sprite.heatScore - minScore) / (maxScore - minScore + 0.0001);
+  //       //sprite.tint = heatColor(t);
+  //       sprite.tint = parseInt(colorScale(sprite.heatScore).hex().substring(1), 16);
+  //     } else {
+  //       sprite.tint = 0xcccccc;
+  //     }
+  //   });
+  //   renderBitmapLabels(rowLabelMeta, locationMap, labelLayer, zoomScale);;
+  // }
 
   function screenToWorld(screenX, screenY) {
     const rect = app.canvas.getBoundingClientRect();
@@ -766,7 +769,15 @@ async function main() {
       const selectedGroup = ruleGroups.find(r => r.name === selectedName);
       if (selectedGroup) {
         console.log("📌 Selected rule group:", selectedGroup.name);
-        runHeatmap(selectedGroup.rules, selectedGroup.name, selectedGroup.color || 0xff0000);
+        runHeatmap({
+          rules: selectedGroup.rules,
+          ruleName: selectedGroup.name,
+          color: selectedGroup.color || "#ff0000",
+          locationMap,
+          evaluateRule,
+          colorScale,
+          renderBitmapLabels
+        });
 
       }
     });
@@ -777,7 +788,15 @@ async function main() {
     if (ruleGroups.length > 0) {
       selector.value = ruleGroups[0].name;
       const defaultGroup = ruleGroups[0];
-      runHeatmap(selectedGroup.rules, selectedGroup.name, selectedGroup.color || 0xff0000);
+      runHeatmap({
+        rules: selectedGroup.rules,
+        ruleName: selectedGroup.name,
+        color: selectedGroup.color || "#ff0000",
+        locationMap,
+        evaluateRule,
+        colorScale,
+        renderBitmapLabels
+      });
 
     }
   });
