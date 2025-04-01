@@ -1,10 +1,11 @@
 import * as PIXI from "pixi.js";
 
-export function renderBitmapLabels(rowLabelMeta, locationMap, labelLayer, zoomScale) {
+export function renderBitmapLabels({ rowLabelMeta, locationMap, labelLayer, zoomScale })
+ {
     
     labelLayer.removeChildren();
     
-    if (zoomScale.value > 0.0075) {
+    if (zoomScale > 0.0075) {
     
         rowLabelMeta.forEach(meta => {
           const label = new PIXI.BitmapText({
@@ -16,7 +17,7 @@ export function renderBitmapLabels(rowLabelMeta, locationMap, labelLayer, zoomSc
           });
       
           label.x = meta.x;
-          if (zoomScale.value > 0.015 && (meta.type === "start" || meta.type === "end")) {
+          if (zoomScale > 0.015 && (meta.type === "start" || meta.type === "end")) {
             label.y = meta.y - 1000;
           } else {
             label.y = meta.y;
@@ -27,7 +28,7 @@ export function renderBitmapLabels(rowLabelMeta, locationMap, labelLayer, zoomSc
         });
     }
 
-    if (zoomScale.value > 0.015) {
+    if (zoomScale > 0.015) {
         locationMap.forEach((sprite, key) => {
          // 🔥 Render heat score labels 
          if (sprite.heatScore == null || isNaN(sprite.heatScore)) return;
