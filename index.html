@@ -2,45 +2,52 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/SMFavicon.png" />
     <link rel="stylesheet" href="/src/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sto-Mo Opto fo sho</title>
+    <title>Sto-Mo</title>
   </head>
   <body>
-
-    
-    <div id="app"></div>
-    <div style="position:absolute;top:10px;right:10px;z-index:10;background:white;padding:10px;">
-      <label for="ruleSelector">Select Rule:</label>
-      <select id="ruleSelector">
-        <option value="">-- Select a Rule --</option>
-      </select>
-      <br/>
-      <label>
-        <input type="checkbox" id="heatmapToggle" checked />
-        Show Heatmap
-      </label>
-      <label>
-        <input type="checkbox" id="layer2Toggle" checked />
-        Show Layer 2
-      </label>
-
-    </div>
-    <div id="sidebar"><strong>Sidebar Menu</strong>
-    <div id="ui-panel">
-      <div id="ui-panel-header" style="cursor:pointer; background:#ccc; padding:8px;">
-        <strong>Attributes ▼</strong>
-      </div>
-      <div id="ui-panel-body">
-        <div id="attribute-panel">
-          <!-- grouped checkboxes go here -->
+    <div id="app">
+      <div id="rules-panel" class="panel floating-panel">
+        <div class="panel-content">
+          <label for="ruleSelector">Select Rule:</label>
+          <select id="ruleSelector">
+            <option value="">-- Select a Rule --</option>
+          </select>
+          <br/><br/>
+          <label><input type="checkbox" id="heatmapToggle" checked /> Show Heatmap</label><br/>
+          <label><input type="checkbox" id="layer2Toggle" /> Show Layer 2</label>
         </div>
       </div>
-    </div>
-  </div>
-    <script type="module" src="/src/main.js"></script>
-    
+      
+      <div id="location-details-panel" class="panel floating-panel bottom-right-panel">
+        <div class="panel-toggle">Location Details</div>
+        <div class="panel-content" id="location-details-content">
+          <!-- Location info will be injected here via JS -->
+          <p>No location selected.</p>
+        </div>
+      </div>
+      
+      <div id="sidebar">
 
+  
+        <div class="panel">
+          <button class="panel-toggle">Attributes</button>
+          <div class="panel-content" id="attribute-panel">
+            <!-- grouped checkboxes will be inserted here by JS -->
+          </div>
+        </div>
+      </div>
+  
+      <div id="canvas-container"></div>
+    </div>
+  
+    <div id="splash-screen">
+      <img src="./src/assets/StoMoSplash.png" alt="Splash Screen" />
+    </div>
+  
+    <script type="module" src="/src/main.js"></script>
   </body>
+  
 </html>

@@ -8,6 +8,22 @@ export async function initCanvas({ width = 1200, height = 800, backgroundColor =
     antialias: true,
   });
 
+  // Add this code in your JS file (e.g., initCanvas.js or main.js)
+  window.addEventListener('load', () => {
+    // Get the splash screen element
+    const splashScreen = document.getElementById('splash-screen');
+
+    // Fade out after 1 second (adjust timing as needed)
+    setTimeout(() => {
+      splashScreen.style.opacity = 0;
+
+      // Remove splash screen from DOM after the fade-out
+      setTimeout(() => {
+        splashScreen.remove();
+      }, 1000);  // 2000ms for the fade-out duration
+    }, 500);  // 1000ms delay before starting fade-out
+  });
+
   await app.init();
   app.renderer.background.color = backgroundColor;
   document.body.appendChild(app.canvas);

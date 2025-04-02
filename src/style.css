@@ -78,16 +78,11 @@ canvas {
 }
 
 #location-details-panel {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  width: 300px;
-  background: white;
-  border: 1px solid #ccc;
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  font-family: sans-serif;
+  bottom: 12px;
+  right: 12px;
+  top: auto;
 }
+
 
 #sidebar {
   position: absolute;
@@ -100,3 +95,124 @@ canvas {
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   font-family: sans-serif;
 }
+
+/* Add this to your existing CSS */
+#splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0);  /* Optional, for semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;  /* Make sure it's on top */
+  opacity: 1;
+  transition: opacity 2s ease-out;
+}
+
+#splash-screen img {
+  width: 50%;  /* Adjust this to the size you prefer */
+  max-width: 400px;  /* Optional limit */
+}
+#app {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+#sidebar {
+  width: 320px;
+  height: 100vh;
+  background: #f2f2f2;
+  border-right: 1px solid #ccc;
+  padding: 12px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#canvas-container {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+/* Collapsible Panels */
+.panel {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.panel-toggle {
+  background: #e2e6ea;
+  border: none;
+  padding: 8px 12px;
+  width: 100%;
+  text-align: left;
+  font-weight: bold;
+  cursor: pointer;
+  outline: none;
+}
+
+.panel-content {
+  display: none;
+  padding: 10px 12px;
+}
+
+.bottom-right-panel {
+  bottom: 12px;
+  top: auto;
+  right: 12px;
+}
+
+.floating-panel {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 20;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  padding: 10px;
+  min-width: 240px;
+}
+
+.floating-panel .panel-content {
+  display: block;
+}
+
+#attribute-panel {
+  max-height: 50vh; /* Or however tall you want it */
+  overflow-y: auto;
+}
+#location-details-content {
+  max-height: 30vh;
+  overflow-y: auto;
+}
+.location-attr-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  gap: 6px;
+}
+
+.color-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  border: 1px solid #999;
+  display: inline-block;
+}
+
+
+

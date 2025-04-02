@@ -155,6 +155,9 @@ export function renderAttributePanel({
         return grouped;
       }
 
+      
+      
+
     //   function updateAttributeColor(attrId, color) {
     //     locationMap.forEach(sprite => {
     //       if (sprite.attributes && sprite.attributes.some(a => a.id === attrId)) {
@@ -188,4 +191,53 @@ export function renderAttributePanel({
 
       renderAttributList();
 
+  }
+
+  export function renderLocationAttributeSummary({
+    containerEl,
+    attributes,
+    attrHandler,
+    onToggleAttribute
+  }) {
+    containerEl.innerHTML = "";
+  
+    attributes.forEach(attr => {
+      const meta = attrHandler.attributeMeta.get(attr.id);
+      if (!meta) return;
+  
+      const row = document.createElement("div");
+      row.classList.add("location-attr-row");
+  
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = document.getElementById(`attr-${attr.id}`)?.checked || false;
+      checkbox.dataset.attrId = attr.id;
+  
+      // Sync toggle with global list
+      checkbox.addEventListener("change", (e) => {
+        const checked = e.target.checked;
+        const attrId = parseInt(e.target.dataset.attrId);
+  
+        // Fire same handler
+        onToggleAttribute(attrId, checked);
+  
+        // Sync other checkboxes
+        document.querySelectorAll(`[data-attr-id="${attrId}"]`).forEach(cb => {
+          if (cb !== checkbox) cb.checked = checked;
+        });
+      });
+  
+      const swatch = document.createElement("span");
+      swatch.className = "color-swatch";
+      swatch.style.backgroundColor = meta.color || "#ccc";
+  
+      const label = document.createElement("label");
+      label.textContent = meta.name;
+      label.style.flex = "1";
+  
+      row.appendChild(checkbox);
+      row.appendChild(swatch);
+      row.appendChild(label);
+      containerEl.appendChild(row);
+    });
   }
