@@ -53,6 +53,7 @@ export function drawRackRows(rack, texture, attrHandler, locationMap, labelMeta,
     if (i === locCount - 1) lastSprite = sprite;
   }
 
+
   // Layer 2 - skip first and last position
   for (let i = 1; i < locCount - 2; i++) {
     const leftIndex = parseInt(rack.to_location) - i;
@@ -86,6 +87,10 @@ export function drawRackRows(rack, texture, attrHandler, locationMap, labelMeta,
 
     layer2Container.addChild(sprite);
   }
+  const layer2Toggle = document.getElementById("layer2Toggle");
+  const showLayer2 = layer2Toggle?.checked ?? true; // default to true if not found
+
+  if(!showLayer2) {layer2Container.visible = false;}
 
   if (firstSprite && lastSprite) {
     let rowMidX = (firstSprite.x + lastSprite.x + locWidth) / 2;
