@@ -60,6 +60,8 @@ export async function initCanvas({ width = 1200, height = 800, backgroundColor =
   viewport.interactive = true;
   viewport.cursor = 'grab';
   viewport.eventMode = 'static';
+  viewport.x = app.canvas.width/2 - 700;
+  viewport.y = app.canvas.height/2 - 500;
 
   app.canvas.addEventListener('pointerdown', (e) => {
     isDragging = true;
@@ -81,30 +83,14 @@ export async function initCanvas({ width = 1200, height = 800, backgroundColor =
     isDragging = false;
     viewport.cursor = 'grab';
   });
-
-  // app.canvas.addEventListener('wheel', (e) => {
-  //   e.preventDefault();
-  //   const zoomAmount = e.deltaY > 0 ? 0.9 : 1.1;
-  //   zoomScale.value *= zoomAmount;
-  //   zoomScale.value = Math.min(Math.max(zoomScale.value, 0.002), 5);
-
-  //   const rect = app.canvas.getBoundingClientRect();
-  //   const mouseX = e.clientX - rect.left;
-  //   const mouseY = e.clientY - rect.top;
-  //   const localX = (mouseX - viewport.x) / viewport.scale.x;
-  //   const localY = (mouseY - viewport.y) / viewport.scale.y;
-  //   viewport.scale.set(zoomScale.value);
-  //   viewport.x = mouseX - localX * zoomScale.value;
-  //   viewport.y = mouseY - localY * zoomScale.value;
-  // }, { passive: false });
-
+  
   //THE ZOOM MINES, BEWARE ALL WHO ENTER
-  //I think the way I have flipped the canvas is the real issue. Of course the inversion impacts the
-  //relationship between world coordinates and screen coordinates. 
-  //But I have REALLY struggled to wrangle this in. I think I need to review the nature
-  //of how I flipped it exactly and what would be a best practice. 
-  //OR I need to revisit WHY I flipped it and see if there is a better way to handle the sprites that 
-  //wouldn't require the inversion but still use the coordinates from TWMS.
+  //This is not an event handler, do not be fooled
+  //This is a battlefield of math and logic
+  //I have fought and died in this function several times
+  //It might look simple and easy but do not let the siren song draw you in
+  //I'm convinced a perfect zoom handler is impossible to achieve in this context.
+  //
   app.canvas.addEventListener('wheel', (e) => {
   e.preventDefault();
 
