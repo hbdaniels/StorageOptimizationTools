@@ -99,4 +99,7 @@ export default class AttributeHandler {
     a.click();
     URL.revokeObjectURL(url);
   }
+
+  
+  
 }

@@ -25,6 +25,12 @@ const {
   attributeUnderlay
 } = await initCanvas();
 
+const GAME_WIDTH = 1920;
+const GAME_HEIGHT = 1080;
+
+resizeRenderer(app.view, GAME_WIDTH, GAME_HEIGHT);
+window.addEventListener('resize', () => resizeRenderer(app.view, GAME_WIDTH, GAME_HEIGHT));
+
 const colorScale = chroma.scale(['#FF0000', '#FFFF00', '#00FF00']).domain([0, 1000]);
 
 const rackrow_subs = rackrow_sub.results[0].items
@@ -39,6 +45,8 @@ const selector = document.getElementById("ruleSelector");
 window.ruleSelector = selector; // 👈 attach to global window object
 
 
+
+
 let labelsVisible = false;
 let previousZoom = zoomScale.value;
 let selectedSprite = null;
@@ -46,8 +54,10 @@ let selectedSprite = null;
 const rowLabelMeta = [];
 const locationMap = new Map();
 
-app.stage.scale.x = -1;
-app.stage.position.x = app.screen.width;
+//app.stage.scale.x = -1;
+//app.stage.position.x = app.screen.width;
+// app.stage.position.x = -300;
+// app.stage.position.y = -150;
 app.stage.addChild(viewport);
 
 
@@ -62,11 +72,11 @@ viewport.eventMode = 'static';
 document.getElementById("layer2Toggle")?.addEventListener("change", (e) => {
     layer2Container.visible = e.target.checked;
   });
-  
+
   
   main();
 
-
+  
 function createLabelCenteredInSprite(text, sprite, fontSize = 1000) {
     const dummy = new PIXI.BitmapText({
       text,
@@ -305,6 +315,7 @@ function drawLoadingStations() {
       y: screenY + rect.top
     };
   }
+
   document.getElementById("heatmapToggle").addEventListener("change", () => {
     // Trigger a redraw of heatmap tints vs. attribute tints
     if (heatmapEnabled) {
@@ -318,6 +329,7 @@ function drawLoadingStations() {
       }
     // Replace with your actual redraw function
   });
+
   function onToggleAttribute(attrId, isChecked) {
     // Your existing logic here, for example:
     if (isChecked) {
@@ -342,6 +354,39 @@ function drawLoadingStations() {
     });
   }
   
+  
+
+
+  function resizeRenderer(view, gameWidth, gameHeight) {
+    const ratio = gameWidth / gameHeight;
+    const windowRatio = window.innerWidth / window.innerHeight;
+  
+    let newWidth, newHeight;
+  
+    // if (windowRatio >= ratio) {
+    //   newHeight = window.innerHeight;
+    //   newWidth = newHeight * ratio;
+    // } else {
+    //   newWidth = window.innerWidth;
+    //   newHeight = newWidth / ratio;
+    // }
+    if (windowRatio >= ratio) {
+      // Fill horizontally, crop top/bottom
+      newWidth = window.innerWidth;
+      newHeight = newWidth / ratio;
+    } else {
+      // Fill vertically, crop left/right
+      newHeight = window.innerHeight;
+      newWidth = newHeight * ratio;
+    }
+  
+    view.style.width = `${newWidth}px`;
+    view.style.height = `${newHeight}px`;
+    view.style.position = 'absolute';
+    view.style.left = `${(window.innerWidth - newWidth) / 2}px`;
+    view.style.top = `${(window.innerHeight - newHeight) / 2}px`;
+  }
+  
 
 async function main() {
   await PIXI.Assets.load('/src/assets/pngFont.fnt');
@@ -357,7 +402,7 @@ async function main() {
   });
 
   let locationTexture = await PIXI.Assets.load('/src/assets/deposit.png')
-  rackrow_subs.forEach(rack => {
+  rackrow_subs.slice().reverse().forEach(rack => {
     drawRackRows(
       rack,
       locationTexture,
@@ -429,27 +474,27 @@ async function main() {
 
 
     // Optionally auto-select first rule on load:
-    if (ruleGroups.length > 0) {
-      selector.value = ruleGroups[0].name;
-      const defaultGroup = ruleGroups[0];
-      runHeatmap({
-        rules: defaultGroup.rules,
-        ruleName: defaultGroup.name,
-        color: defaultGroup.color || "#ff0000",
-        locationMap,
-        evaluateRule,
-        colorScale,
-        renderBitmapLabels: () =>
-        renderBitmapLabels({
-          rowLabelMeta,
-          locationMap,
-          labelLayer,
-          zoomScale: zoomScale.value
-        })
+    // if (ruleGroups.length > 0) {
+    //   selector.value = ruleGroups[0].name;
+    //   const defaultGroup = ruleGroups[0];
+    //   runHeatmap({
+    //     rules: defaultGroup.rules,
+    //     ruleName: defaultGroup.name,
+    //     color: defaultGroup.color || "#ff0000",
+    //     locationMap,
+    //     evaluateRule,
+    //     colorScale,
+    //     renderBitmapLabels: () =>
+    //     renderBitmapLabels({
+    //       rowLabelMeta,
+    //       locationMap,
+    //       labelLayer,
+    //       zoomScale: zoomScale.value
+    //     })
       
-      });
+    //   });
 
-    }
+    // }
   });
  
   setupUIPanels();
