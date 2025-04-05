@@ -2,6 +2,7 @@
 import * as PIXI from 'pixi.js';
 import { getPosition, isLocked, getDisplayName } from '../utils/CoilUtils.js';
 
+
 /**
  * Draws coils onto a PIXI container.
  * @param {PIXI.Container} container - The container to draw coils into (e.g., layer1CoilsContainer).
@@ -13,7 +14,6 @@ export function drawCoils(container, coils, options = {}) {
 
   for (const coil of coils) {
     const { x, y } = getPosition(coil);
-
     const g = new PIXI.Graphics();
     g.lineStyle(2, isLocked(coil) ? 0xff0000 : 0x2d89ef, 1);
     g.beginFill(0xffffff);
