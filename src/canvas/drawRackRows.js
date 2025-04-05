@@ -26,10 +26,11 @@ export function drawRackRows(rack, texture, attrHandler, locationMap, labelMeta,
     const baseKey = `${rack.bay}-${rack.area}-${rack.rowname}-${baseIndex}`;
     const locKey = `${baseKey}-1`; // Layer 1
     const sprite = new PIXI.Sprite(texture);
-    sprite.x = x0 + i * locWidth;
+    sprite.x = x0 + (i * locWidth) + 750;
     sprite.y = rowY;
     sprite.width = locWidth - 200;
     sprite.height = height;
+    sprite.anchor.set(0, 0.5);
 
     const attrList = attrHandler.attributeMap.get(baseKey);
     sprite.attributes = attrList?.map(attr => {
@@ -97,11 +98,11 @@ export function drawRackRows(rack, texture, attrHandler, locationMap, labelMeta,
     let rowMidY = rowY - height;
 
     if (["SHO", "PR1", "PR2", "PR3", "SHI", "CPL", "PAC"].includes(rack.rowname)) {
-      rowMidX = (firstSprite.x + lastSprite.x) / 2;
+      rowMidX = ((firstSprite.x + lastSprite.x) / 2) - 800;
       rowMidY = rowY + height / 2 - 200;
     }
 
-    labelMeta.push({ text: rack.rowname, x: rowMidX, y: rowMidY, type: "mid" });
+    labelMeta.push({ text: rack.rowname, x: rowMidX, y: rowMidY - 500, type: "mid" });
     labelMeta.push({ ...centerLabel(`${rack.to_location}`, firstSprite), type: "start" });
     labelMeta.push({ ...centerLabel(`${rack.from_location}`, lastSprite), type: "end" });
   }
@@ -115,7 +116,7 @@ function centerLabel(text, sprite, fontSize = 1000) {
 
   return {
     text,
-    x: sprite.x + (sprite.width / 2) + (dummy.width / 2) - 300,
-    y: sprite.y + (sprite.height / 2) - (dummy.height / 2) + 200
+    x: sprite.x + (sprite.width / 2) - 500, //+ (dummy.width / 2),
+    y: sprite.y + (sprite.height / 2) - (dummy.height / 2) - 300
   };
 }

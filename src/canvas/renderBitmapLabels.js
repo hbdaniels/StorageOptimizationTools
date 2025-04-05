@@ -45,8 +45,8 @@ export function renderBitmapLabels({ rowLabelMeta, locationMap, labelLayer, laye
           }
         });
   
-        heatLabel.x = sprite.x + sprite.width / 2;
-        heatLabel.y = sprite.y + sprite.height / 2;
+        heatLabel.x = sprite.x //- sprite.width / 2;
+        heatLabel.y = sprite.y //+ sprite.height / 2;
         heatLabel.anchor = { x: 0.5, y: 0.5 };
         heatLabel.scale.x = -1;
         heatLabel.tint = 0x000000;

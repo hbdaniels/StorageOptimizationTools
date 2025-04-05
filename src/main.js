@@ -424,8 +424,11 @@ async function main() {
     );
   });
 
-  drawCoils(layer1CoilsContainer, coils, { debugLabels: true });
-  viewport.addChild(layer1CoilsContainer);
+  //drawCoils(layer1CoilsContainer, coils, { debugLabels: true });
+  
+  const coilTexture = await PIXI.Assets.load('/src/assets/coil.png');
+  drawCoils(layer1CoilsContainer, coils, { coilTexture });
+  //viewport.addChild(layer1CoilsContainer);
   
   
   drawLoadingStations();
