@@ -12,14 +12,22 @@ import { drawRackRows } from './canvas/drawRackRows.js';
 import { renderBitmapLabels } from './canvas/renderBitmapLabels.js';
 import { runHeatmap } from "./canvas/heatmap.js";
 import { renderAttributePanel, renderLocationAttributeSummary } from './ui/attributePanel.js';
+import coilsData from "../jsonFiles/coils_subset.json";
+import { hydrateCoil, getPosition, isLocked } from './utils/CoilUtils.js';
+import { drawCoils } from './canvas/drawCoils.js';
 
+
+const rawCoils = coilsData.results[0].items;
+const coils = rawCoils.map(hydrateCoil);
 
 const {
   app,
   viewport,
   zoomScale,
   layer1Container,
+  layer1CoilsContainer,
   layer2Container,
+  layer2CoilsContainer,
   labelLayer,
   shopFloorContainer,
   attributeUnderlay
@@ -393,6 +401,7 @@ async function main() {
 
   drawArea("ST21", 173208, 242700, 523520, 278100, 0x3c486c);
   drawArea("ST22", 173208, 203005, 523520, 240358, 0x3c486c);
+
   renderAttributePanel({
     attrHandler: attrHandler,
     locationMap: locationMap,
@@ -414,6 +423,10 @@ async function main() {
       layer2Container 
     );
   });
+
+  drawCoils(layer1CoilsContainer, coils, { debugLabels: true });
+  viewport.addChild(layer1CoilsContainer);
+  
   
   drawLoadingStations();
   viewport.addChild(labelLayer);
