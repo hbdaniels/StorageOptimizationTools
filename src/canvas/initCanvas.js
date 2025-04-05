@@ -41,6 +41,7 @@ export async function initCanvas({ width = 1200, height = 800, backgroundColor =
   const layer1CoilsContainer = new PIXI.Container();
   const layer2Container = new PIXI.Container();
   const layer2CoilsContainer = new PIXI.Container();
+  const flowLayerContainer = new PIXI.Container();
   const attributeUnderlay = new PIXI.Container();
   const labelLayer = new PIXI.Container();
 
@@ -49,6 +50,7 @@ export async function initCanvas({ width = 1200, height = 800, backgroundColor =
   viewport.addChild(layer1CoilsContainer);
   viewport.addChild(layer2Container);
   viewport.addChild(layer2CoilsContainer);
+  viewport.addChild(flowLayerContainer);
   viewport.addChild(attributeUnderlay);
   viewport.addChild(labelLayer);
 
@@ -130,6 +132,7 @@ export async function initCanvas({ width = 1200, height = 800, backgroundColor =
     layer1CoilsContainer,
     layer2Container,
     layer2CoilsContainer,
+    flowLayerContainer,
     labelLayer,
     shopFloorContainer,
     attributeUnderlay

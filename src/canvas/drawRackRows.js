@@ -13,25 +13,29 @@ export function drawRackRows(rack, texture, attrHandler, locationMap, labelMeta,
   }
 
   const locCount = (rack.to_location - rack.from_location) + 1;
-const rackWidth = Math.abs(endX - startX);
-let locWidth = locCount > 1 ? rackWidth / locCount : rackWidth;
+  const rackWidth = Math.abs(endX - startX);
+  let locWidth;
 
-  if (locWidth < 500) locWidth = 1500;
-
+  if (locCount <= 1) {
+    locWidth = 1500; // fallback for single-location rows
+  } else {
+    locWidth = (Math.abs(endX - startX)) / (locCount - 1);
+    if (locWidth < 500) locWidth = 1500;
+  }
   let firstSprite = null;
   let lastSprite = null;
   const x0 = endX;
-
+  
   for (let i = 0; i < locCount; i++) {
     const baseIndex = parseInt(rack.to_location) - i;
     const baseKey = `${rack.bay}-${rack.area}-${rack.rowname}-${baseIndex}`;
     const locKey = `${baseKey}-1`; // Layer 1
     const sprite = new PIXI.Sprite(texture);
-    sprite.x = x0 + (i * locWidth) + 750;
+    sprite.x = x0 + (i * locWidth) //+ 750;
     sprite.y = rowY;
     sprite.width = locWidth - 200;
     sprite.height = height;
-    sprite.anchor.set(1, 0.5);
+    sprite.anchor.set(0.5, 0.5);
 
     const attrList = attrHandler.attributeMap.get(baseKey);
     sprite.attributes = attrList?.map(attr => {
@@ -57,38 +61,44 @@ let locWidth = locCount > 1 ? rackWidth / locCount : rackWidth;
 
 
   // Layer 2 - skip first and last position
-  for (let i = 1; i < locCount - 2; i++) {
-    const leftIndex = parseInt(rack.to_location) - i;
-    const rightIndex = parseInt(rack.to_location) - (i + 1);
-    const baseKey = `${rack.bay}-${rack.area}-${rack.rowname}-${rightIndex}`;
-    const locKey = `${baseKey}-2`; // Layer 2 key
-    const sprite = new PIXI.Sprite(texture);
-    const xLeft = x0 + i * locWidth;
-    const xRight = x0 + (i + 1) * locWidth;
-    sprite.x = (xLeft + xRight) / 2;
-    sprite.y = rowY;
-    sprite.width = locWidth - 300;
-    sprite.height = height;
-    sprite.alpha = 0.7; // Visual distinction
+  // Layer 2 - skip first and last positions
+for (let i = 1; i < locCount - 1; i++) {
+  const index = parseInt(rack.to_location) - i;
+  const baseKey = `${rack.bay}-${rack.area}-${rack.rowname}-${index}`;
+  const locKey = `${baseKey}-2`;
 
-    const attrList = attrHandler.attributeMap.get(baseKey);
-    sprite.attributes = attrList?.map(attr => {
-      const meta = attrHandler.attributeMeta.get(attr.attributeId);
-      return {
-        id: attr.attributeId,
-        name: meta?.name || `Attribute ${attr.attributeId}`,
-        description: meta?.description || ""
-      };
-    }) || [];
+  const sprite = new PIXI.Sprite(texture);
 
-    locationMap.set(locKey, sprite);
-    sprite.locationKey = locKey;
-    sprite.eventMode = "static";
-    sprite.cursor = "pointer";
-    sprite.on("pointerdown", () => onClick(sprite));
+  // X: fall between Layer 1 locations
+  const x = x0 + i * locWidth + locWidth / 2;
+  sprite.x = x;
 
-    layer2Container.addChild(sprite);
-  }
+  // Y: match Layer 1 vertical placement
+  sprite.y = rowY;
+  sprite.width = locWidth - 300;
+  sprite.height = height;
+  sprite.anchor.set(0.5, 0.5);
+  sprite.alpha = 0.7;
+
+  const attrList = attrHandler.attributeMap.get(baseKey);
+  sprite.attributes = attrList?.map(attr => {
+    const meta = attrHandler.attributeMeta.get(attr.attributeId);
+    return {
+      id: attr.attributeId,
+      name: meta?.name || `Attribute ${attr.attributeId}`,
+      description: meta?.description || ""
+    };
+  }) || [];
+
+  locationMap.set(locKey, sprite);
+  sprite.locationKey = locKey;
+  sprite.eventMode = "static";
+  sprite.cursor = "pointer";
+  sprite.on("pointerdown", () => onClick(sprite));
+
+  layer2Container.addChild(sprite);
+}
+
   const layer2Toggle = document.getElementById("layer2Toggle");
   const showLayer2 = layer2Toggle?.checked ?? true; // default to true if not found
 

@@ -17,8 +17,10 @@ import { hydrateCoil, getPosition, isLocked } from './utils/CoilUtils.js';
 import { drawCoils } from './canvas/drawCoils.js';
 
 
+
 const rawCoils = coilsData.results[0].items;
 const coils = rawCoils.map(hydrateCoil);
+const flowCoilIds = ["1199561410", "1199595830", "2302016920", "2104007300" ];
 
 const {
   app,
@@ -28,6 +30,7 @@ const {
   layer1CoilsContainer,
   layer2Container,
   layer2CoilsContainer,
+  flowLayerContainer,
   labelLayer,
   shopFloorContainer,
   attributeUnderlay
@@ -78,13 +81,26 @@ viewport.cursor = 'grab';
 viewport.eventMode = 'static';
 
 document.getElementById("layer2Toggle")?.addEventListener("change", (e) => {
-    layer2Container.visible = e.target.checked;
+  layer2Container.visible = e.target.checked;
+    
   });
+document.getElementById("layer2CoilsToggle")?.addEventListener("change", (e) => {
+  layer2CoilsContainer.visible = e.target.checked;
+  
+});
+
+const toggleEl = document.getElementById("layer1CoilsToggle");
+console.log("🧪 layer1CoilsToggle found?", !!toggleEl);
+
+document.getElementById("layer1CoilsToggle")?.addEventListener("change", (e) => {
+  console.log("🔘 Layer 1 toggle changed:", e.target.checked);
+  layer1CoilsContainer.visible = e.target.checked;
+});
+
 
   
   main();
 
-  
 function createLabelCenteredInSprite(text, sprite, fontSize = 1000) {
     const dummy = new PIXI.BitmapText({
       text,
@@ -402,6 +418,66 @@ function drawLoadingStations() {
     view.style.left = `${(window.innerWidth - newWidth) / 2}px`;
     view.style.top = `${(window.innerHeight - newHeight) / 2}px`;
   }
+
+  function drawPullArrow(container, from, to, color = 0xff80bf, thickness = 300, alpha = 1, headLength = 800) {
+    const g = new PIXI.Graphics();
+    g.beginFill(color, alpha);
+  
+    const fullDx = to.x - from.x;
+    const fullDy = to.y - from.y;
+    const totalLength = Math.sqrt(fullDx * fullDx + fullDy * fullDy);
+    const margin = 500; // 🔁 adjust this as needed
+
+    const ratio = (totalLength - margin) / totalLength;
+    const dx = fullDx * ratio;
+    const dy = fullDy * ratio;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx);
+
+  
+    const bodyLength = length - headLength;
+  
+    // Draw arrow body
+    g.moveTo(0, -thickness / 2);
+    g.lineTo(bodyLength, -thickness / 2);
+    g.lineTo(bodyLength, -thickness);
+    
+    // Arrowhead (triangle)
+    g.lineTo(length, 0);
+    g.lineTo(bodyLength, thickness);
+    g.lineTo(bodyLength, thickness / 2);
+    
+    g.lineTo(0, thickness / 2);
+    g.closePath();
+    g.endFill();
+  
+    g.position.set(from.x, from.y);
+    g.rotation = angle;
+    
+
+    g.filters = [new DropShadowFilter({
+      blur: 4,
+      distance: 0,
+      color: 0x000000,
+      alpha: 0.3
+    })];
+  
+    container.addChild(g);
+    // Add subtle pulse animation
+let pulse = 0;
+app.ticker.add(() => {
+  pulse += 0.05;
+  const scaleFactor = 1 + 0.03 * Math.sin(pulse); // adjust amplitude/speed here
+  g.scale.set(scaleFactor);
+});
+
+    return g;
+  }
+  
+  
+  
+  
+  
   
 
 async function main() {
@@ -435,7 +511,7 @@ async function main() {
   //drawCoils(layer1CoilsContainer, coils, { debugLabels: true });
   
   const coilTexture = await PIXI.Assets.load('/src/assets/coil.png');
-  drawCoils(layer1CoilsContainer, coils, { coilTexture });
+  drawCoils(layer1CoilsContainer, layer2CoilsContainer, coils, { coilTexture });
   //viewport.addChild(layer1CoilsContainer);
   
   
@@ -445,6 +521,20 @@ async function main() {
   const header = document.getElementById("ui-panel-header");
   const body = document.getElementById("ui-panel-body");
   
+  const slhPullTarget = { x: 458150, y: 229350 };
+  console.log("🧭 flowLayerContainer:", flowLayerContainer);
+
+  for (const coil of coils) {
+    if (coil.succesive_plant_code === "SLH" &&
+    flowCoilIds.includes(coil.material_id)) {
+      const from = { x: coil.coord_x, y: coil.coord_y };
+      const to = { x: 458150, y: 229350 };
+    
+      console.log("🧭 Drawing line from", from, "to", to);
+    
+      drawPullArrow(flowLayerContainer, from, to);
+    }
+  }
   
   const target = locationMap.get("ST21-A2-G-40");
   if (target) {
@@ -494,31 +584,7 @@ async function main() {
       }
     });
     
-    
 
-
-    // Optionally auto-select first rule on load:
-    // if (ruleGroups.length > 0) {
-    //   selector.value = ruleGroups[0].name;
-    //   const defaultGroup = ruleGroups[0];
-    //   runHeatmap({
-    //     rules: defaultGroup.rules,
-    //     ruleName: defaultGroup.name,
-    //     color: defaultGroup.color || "#ff0000",
-    //     locationMap,
-    //     evaluateRule,
-    //     colorScale,
-    //     renderBitmapLabels: () =>
-    //     renderBitmapLabels({
-    //       rowLabelMeta,
-    //       locationMap,
-    //       labelLayer,
-    //       zoomScale: zoomScale.value
-    //     })
-      
-    //   });
-
-    // }
   });
  
   setupUIPanels();
@@ -540,4 +606,5 @@ function setupUIPanels() {
 
   // Expand the first panel by default
   toggles[0].nextElementSibling.style.display = 'block';
+  
 }
