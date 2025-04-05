@@ -12,7 +12,7 @@ import { drawRackRows } from './canvas/drawRackRows.js';
 import { renderBitmapLabels } from './canvas/renderBitmapLabels.js';
 import { runHeatmap } from "./canvas/heatmap.js";
 import { renderAttributePanel, renderLocationAttributeSummary } from './ui/attributePanel.js';
-import coilsData from "../jsonFiles/coils_subset.json";
+import coilsData from "../jsonFiles/coils.json";
 import { hydrateCoil, getPosition, isLocked } from './utils/CoilUtils.js';
 import { drawCoils } from './canvas/drawCoils.js';
 
@@ -249,28 +249,36 @@ function drawLoadingStations() {
     
   
   function showLocationDetails(locationData) {
-    let panel = document.getElementById("location-details-panel");
+    const panel = document.getElementById("location-details-content");
   
     if (!panel) {
-      panel = document.createElement("div");
-      panel.id = "location-details-panel";
-      panel.className = "panel floating-panel bottom-right-panel";
-      document.getElementById("app").appendChild(panel);
+      console.warn("No location details panel found!");
+      return;
     }
   
     panel.innerHTML = `
-      <div class="panel-toggle">Location Details</div>
-      <div class="panel-content">
-        <p><strong>Name:</strong> ${locationData.locationKey}</p>
-        <p><strong>X:</strong> ${locationData.x}</p>
-        <p><strong>Y:</strong> ${locationData.y}</p>
-        <p><strong>Attributes:</strong></p>
-        <div id="location-details-attributes"></div>
-      </div>
+      <p><strong>Name:</strong> ${locationData.locationKey}</p>
+      <p><strong>X:</strong> ${locationData.x}</p>
+      <p><strong>Y:</strong> ${locationData.y}</p>
+      <p><strong>Attributes:</strong></p>
+      <div id="location-details-attributes"></div>
     `;
   
-    panel.style.display = "block";
+    // Example: render attributes nicely into #location-details-attributes
+    const attrContainer = document.getElementById("location-details-attributes");
+    if (attrContainer && locationData.attributes) {
+      Object.entries(locationData.attributes).forEach(([key, value]) => {
+        const row = document.createElement("div");
+        row.className = "location-attr-row";
+        row.innerHTML = `
+          <span class="color-swatch" style="background-color: ${value.color || '#ccc'};"></span>
+          <span>${key}: ${value.label || value}</span>
+        `;
+        attrContainer.appendChild(row);
+      });
+    }
   }
+  
 
    function updateAttributeColor(attrId, color) {
      locationMap.forEach(sprite => {

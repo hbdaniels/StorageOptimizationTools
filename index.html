@@ -23,19 +23,14 @@
         </div>
       </div>
       
-      <div id="location-details-panel" class="panel floating-panel bottom-right-panel">
-        <div class="panel-toggle">Location Details</div>
-        <div class="panel-content" id="location-details-content">
-          <!-- Location info will be injected here via JS -->
-          <p>No location selected.</p>
-        </div>
+      <div id="details-panel">
+        <h3>Location Details</h3>
+        <div id="location-details-content" class="panel-content"></div>
+        <h3>Coil Details</h3>
+        <div id="coil-details-content" class="panel-content"></div>
       </div>
-      <div id="coil-details-overlay" class="panel floating-sub-panel">
-        <div class="panel-content" id="coil-details-content">
-          <!-- Coil-specific info goes here -->
-          <p>No coil selected.</p>
-        </div>
-      </div>
+      
+      
       
       <div id="sidebar">
 
@@ -44,6 +39,12 @@
           <button class="panel-toggle">Attributes</button>
           <div class="panel-content" id="attribute-panel">
             <!-- grouped checkboxes will be inserted here by JS -->
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-toggle">Coil Color Rules</div>
+          <div class="panel-content" id="coil-color-rules-panel">
+            <!-- JS will populate this -->
           </div>
         </div>
       </div>

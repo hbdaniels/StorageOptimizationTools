@@ -1,7 +1,8 @@
 // DrawCoils.js
 import * as PIXI from 'pixi.js';
-import { getPosition, isLocked, getDisplayName } from '../utils/CoilUtils.js';
 
+import { getPosition, isLocked, getDisplayName } from '../utils/CoilUtils.js';
+import {coilColorRules} from '../canvas/CoilColorRules.js';
 
 
 /**
@@ -30,6 +31,16 @@ export function drawCoils(container, coils, options = {}) {
     sprite.cursor = 'pointer';
     sprite.eventMode = 'static';
     sprite.coilId = coil.material_id;
+
+    const rule = coilColorRules.find(rule => rule.enabled && rule.condition(coil));
+
+    if (rule) {
+      console.log(`Applying rule "${rule.name}" to coil ${coil.material_id}`);
+      // tint the sprite or add a border
+      sprite.tint = parseInt(rule.color.replace('#', '0x'), 16);
+
+    }
+
 
     sprite.addEventListener('pointerdown', () => {
         const panel = document.getElementById('coil-details-content');

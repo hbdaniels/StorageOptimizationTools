@@ -12,9 +12,10 @@ export function drawRackRows(rack, texture, attrHandler, locationMap, labelMeta,
     return;
   }
 
-  const rackWidth = Math.abs(endX - startX);
   const locCount = (rack.to_location - rack.from_location) + 1;
-  let locWidth = rackWidth / locCount;
+const rackWidth = Math.abs(endX - startX);
+let locWidth = locCount > 1 ? rackWidth / locCount : rackWidth;
+
   if (locWidth < 500) locWidth = 1500;
 
   let firstSprite = null;
@@ -30,7 +31,7 @@ export function drawRackRows(rack, texture, attrHandler, locationMap, labelMeta,
     sprite.y = rowY;
     sprite.width = locWidth - 200;
     sprite.height = height;
-    sprite.anchor.set(0, 0.5);
+    sprite.anchor.set(1, 0.5);
 
     const attrList = attrHandler.attributeMap.get(baseKey);
     sprite.attributes = attrList?.map(attr => {
@@ -94,7 +95,8 @@ export function drawRackRows(rack, texture, attrHandler, locationMap, labelMeta,
   if(!showLayer2) {layer2Container.visible = false;}
 
   if (firstSprite && lastSprite) {
-    let rowMidX = (firstSprite.x + lastSprite.x + locWidth) / 2;
+    let rowMidX = (startX + endX) / 2;
+
     let rowMidY = rowY - height;
 
     if (["SHO", "PR1", "PR2", "PR3", "SHI", "CPL", "PAC"].includes(rack.rowname)) {
@@ -113,10 +115,12 @@ function centerLabel(text, sprite, fontSize = 1000) {
     text,
     style: { fontName: "DefaultFont", fontSize }
   });
+  sprite.anchor.set(0.5, 0.5);
+  // Center the label horizontally based on the sprite's actual center
+  const spriteCenterX = sprite.x - dummy.width /2 //* sprite.anchor.x;
+  const x = spriteCenterX + sprite.width / 2 + dummy.width / 2;
+  const y = sprite.y + sprite.height / 2 - dummy.height / 2 - 300;
 
-  return {
-    text,
-    x: sprite.x + (sprite.width / 2) - 500, //+ (dummy.width / 2),
-    y: sprite.y + (sprite.height / 2) - (dummy.height / 2) - 300
-  };
+  return { text, x, y };
 }
+

@@ -9,6 +9,7 @@ export function renderAttributePanel({
     function renderAttributList() {
         const attributeListEl = document.getElementById("attribute-panel");
         attributeListEl.innerHTML = "";
+        
       
         const groupedAttrs = groupAttributesByBay(attrHandler.attributeMeta);
         Object.entries(groupedAttrs).forEach(([bay, attrs]) => {
@@ -37,6 +38,7 @@ export function renderAttributePanel({
           titleWrapper.appendChild(titleSpan);
           titleSpan.style.cursor = "pointer";
           titleSpan.style.fontWeight = "bold";
+          
           
         //   titleSpan.addEventListener("click", () => {
         //     const isVisible = body.style.display !== "none";
