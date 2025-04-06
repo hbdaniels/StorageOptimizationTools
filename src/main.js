@@ -750,6 +750,7 @@ function createDirectionalRipple(from, to, container, options = {}) {
 }
 
 
+
   
   
   
@@ -807,6 +808,8 @@ async function main() {
   const slhPullTarget = { x: 458150, y: 229350 };
   console.log("🧭 flowLayerContainer:", flowLayerContainer);
 
+  
+
   for (const coil of coils) {
     if (
       coil.succesive_plant_code === "SLH" &&
@@ -814,10 +817,33 @@ async function main() {
     ) {
       const from = { x: coil.coord_x, y: coil.coord_y };
       const to = { x: 458150, y: 229350 };
-  
+
+      const d = new PIXI.Graphics();
+      d.beginFill(0xff0000);
+      d.drawCircle(0, 0, 500);
+      d.endFill();
+      d.position.set(from.x, from.y);
+      console.log(from, to);
+      flowLayerContainer.addChild(d);
+
       console.log("🧭 Drawing SLH flow line from", from, "to", to);
   
       drawPullArrow(flowLayerContainer, from, to, 0xd36aa1);
+      drawPullArrow(flowLayerContainer, from, to, 0x66ccff);
+      // animateParticlesAlongArrow(from, to, flowLayerContainer, {
+      //   color: 0x66ccff,
+      //   count: 20,
+      //   size: 400,
+      //   speed: 0.007
+      // });
+      recruitWigglyCousinsToMarch(from, to, flowLayerContainer, {
+        color: 0x66ccff,
+        count: 20,
+        size: 800,
+        speed: 0.005
+      });
+      
+
   
       // 🎯 New effects
       createShockwaveRipple(to, flowLayerContainer, { color: 0xff66cc });
@@ -870,6 +896,15 @@ async function main() {
 
   
   startShockwaveEmitter(centerOfSprite(packEntryPoints.ST21), flowLayerContainer, { color: 0xff66cc });
+  //testStaticParticles(flowLayerContainer);
+  testAnimatedParticles(flowLayerContainer);
+  const debugDot = new PIXI.Graphics();
+debugDot.beginFill(0xff0000);
+debugDot.drawCircle(0, 0, 1000);
+debugDot.endFill();
+debugDot.position.set(305000, 225000);
+flowLayerContainer.addChild(debugDot);
+
 
   
   const blurFilter = new PIXI.BlurFilter(0.1);
@@ -937,6 +972,7 @@ async function main() {
   });
  
   setupUIPanels();
+
 }
 
 function setupUIPanels() {
@@ -957,3 +993,252 @@ function setupUIPanels() {
   toggles[0].nextElementSibling.style.display = 'block';
   
 }
+
+function testStaticParticles(container) {
+  const particles = [];
+
+  for (let i = 0; i < 20; i++) {
+    const p = new PIXI.Sprite(PIXI.Texture.WHITE);
+    p.tint = 0x66ccff;
+    p.width = p.height = 800;
+    p.alpha = 0.5;
+
+    // Scatter around a center
+    const baseX = 300000 + Math.random() * 10000;
+    const baseY = 220000 + Math.random() * 10000;
+    p.position.set(baseX, baseY);
+    p.vx = Math.random() * 10 - 5;
+    p.vy = Math.random() * 10 - 5;
+
+    particles.push(p);
+    container.addChild(p);
+  }
+
+  app.ticker.add(() => {
+    for (const p of particles) {
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Bounce off small radius bounds
+      if (p.x < 295000 || p.x > 305000) p.vx *= -1;
+      if (p.y < 215000 || p.y > 225000) p.vy *= -1;
+    }
+  });
+}
+
+function testAnimatedParticles(container) {
+  const particles = [];
+
+  for (let i = 0; i < 30; i++) {
+    const sprite = new PIXI.Sprite(PIXI.Texture.WHITE);
+    sprite.tint = 0x66ccff;
+    sprite.width = sprite.height = 800;
+    sprite.alpha = 0.5;
+
+    const baseX = 305000 + Math.random() * 2000;
+    const baseY = 225000 + Math.random() * 2000;
+    sprite.position.set(baseX, baseY); // ✅ immediately place
+
+    // Store animation info
+    sprite.baseX = baseX;
+    sprite.baseY = baseY;
+    sprite.phase = Math.random() * Math.PI * 2;
+    sprite.freq = 0.01 + Math.random() * 0.01;
+    sprite.amp = 2000 + Math.random() * 2000;
+
+    container.addChild(sprite);
+    particles.push(sprite);
+  }
+
+  let tick = 0;
+  app.ticker.add(() => {
+    tick += 1;
+    for (const p of particles) {
+      const t = tick * p.freq + p.phase;
+      p.x = p.baseX + Math.cos(t) * p.amp;
+      p.y = p.baseY + Math.sin(t * 1.5) * p.amp * 0.5;
+    }
+  });
+}
+
+function createFlowStream(center, container) {
+  const particles = [];
+
+  for (let i = 0; i < 50; i++) {
+    const p = new PIXI.Sprite(PIXI.Texture.WHITE);
+    p.tint = 0x66ccff;
+    p.width = p.height = 400;
+    p.alpha = 0.3 + Math.random() * 0.3;
+    
+    const x = center.x + Math.random() * 20000 - 10000;
+    const y = center.y + Math.random() * 20000 - 10000;
+    p.position.set(x, y);
+
+    p.vx = 100 + Math.random() * 100;
+    p.life = 0;
+    container.addChild(p);
+    particles.push(p);
+  }
+
+  app.ticker.add(() => {
+    for (const p of particles) {
+      p.x += p.vx;
+      p.life++;
+      if (p.life > 200) {
+        p.x = center.x + Math.random() * 20000 - 10000;
+        p.y = center.y + Math.random() * 20000 - 10000;
+        p.life = 0;
+      }
+    }
+  });
+}
+
+function createFlickerAura(center, container) {
+  const particles = [];
+
+  for (let i = 0; i < 20; i++) {
+    const p = new PIXI.Sprite(PIXI.Texture.WHITE);
+    p.tint = 0xff66cc;
+    p.width = p.height = 1200;
+    p.anchor.set(0.5);
+    p.alpha = 0.1;
+
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 4000 + Math.random() * 2000;
+    p.baseX = center.x + Math.cos(angle) * dist;
+    p.baseY = center.y + Math.sin(angle) * dist;
+    p.phase = Math.random() * Math.PI * 2;
+
+    p.position.set(p.baseX, p.baseY);
+    container.addChild(p);
+    particles.push(p);
+  }
+
+  app.ticker.add(() => {
+    for (const p of particles) {
+      const t = performance.now() / 100;
+      p.alpha = 0.2 + 0.2 * Math.sin(t + p.phase);
+      p.scale.set(0.9 + 0.1 * Math.sin(t * 1.5 + p.phase));
+    }
+  });
+}
+
+function animateParticlesAlongArrow(from, to, container, {
+  color = 0x66ccff,
+  count = 30,
+  size = 800,
+  speed = 0.005
+} = {}) {
+  const particles = [];
+
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const length = Math.sqrt(dx * dx + dy * dy);
+  flowLayerContainer.filters = []; // <- 🔕 no blur
+
+  for (let i = 0; i < count; i++) {
+    const p = new PIXI.Sprite(PIXI.Texture.WHITE);
+  
+    // 🔁 Set size FIRST, then anchor, then scale
+    p.width = p.height = size;
+    p.anchor.set(0.5);
+    p.scale.set(1);
+    p.alpha = 0.5;
+    p.tint = color;
+  
+    const t = i / count;
+    p.baseX = from.x + dx * t;
+    p.baseY = from.y + dy * t;
+    p.phase = Math.random() * Math.PI * 2;
+    p.freq = 0.01 + Math.random() * 0.01;
+    p.amp = 0;
+  
+    p.position.set(p.baseX, p.baseY);
+  
+    if (i === 0) {
+      p.tint = 0xff0000;
+      p.alpha = 1;
+      p.width = p.height = 2000; // again, BEFORE anchor
+      p.anchor.set(0.5);
+      p.scale.set(1);
+      console.log("🔴 BIG PARTICLE @", p.baseX, p.baseY);
+    }
+  
+    container.addChild(p);
+    particles.push(p);
+  }
+  
+
+  let tick = 0;
+app.ticker.add(() => {
+  tick += 1;
+
+  if (tick % 60 === 0) {
+    console.log(`🔄 Tick ${tick} — particles: ${particles.length}`);
+  }
+
+  for (let i = 0; i < particles.length; i++) {
+    const p = particles[i];
+    const t = tick * p.freq + p.phase;
+
+    p.x = p.baseX + Math.cos(t) * p.amp;
+    p.y = p.baseY + Math.sin(t) * p.amp;
+
+    p.alpha = 0.5 + 0.5 * Math.sin(t * 2);
+    const scale = 0.8 + 0.3 * Math.cos(t * 3);
+    p.scale.set(scale);
+
+    // 🔍 Only log the first one every 60 ticks
+    if (i === 0 && tick % 60 === 0) {
+      console.log(`🧼 P0 → x: ${p.x.toFixed(1)} y: ${p.y.toFixed(1)} alpha: ${p.alpha.toFixed(2)} scale: ${scale.toFixed(2)}`);
+    }
+  }
+});
+
+}
+
+function recruitWigglyCousinsToMarch(from, to, container, {
+  color = 0x66ccff,
+  count = 20,
+  size = 800,
+  speed = 0.003
+} = {}) {
+  const particles = [];
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const angle = Math.atan2(dy, dx);
+
+  for (let i = 0; i < count; i++) {
+    const sprite = new PIXI.Sprite(PIXI.Texture.WHITE);
+    sprite.tint = color;
+    sprite.width = sprite.height = size;
+    sprite.alpha = 0.5;
+    sprite.anchor.set(0.5);
+
+    const t = i / count;
+    sprite._progress = t;
+    sprite.baseX = from.x + dx * t;
+    sprite.baseY = from.y + dy * t;
+    sprite.freq = 1;
+    sprite.amp = 0;
+
+    sprite.position.set(sprite.baseX, sprite.baseY);
+    container.addChild(sprite);
+    particles.push(sprite);
+  }
+
+  app.ticker.add(() => {
+    for (const p of particles) {
+      p._progress += speed;
+      if (p._progress > 1) p._progress = 0;
+
+      const x = from.x + dx * p._progress;
+      const y = from.y + dy * p._progress;
+      p.position.set(x, y);
+    }
+  });
+}
+
+
+
+
