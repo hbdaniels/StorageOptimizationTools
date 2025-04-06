@@ -839,9 +839,18 @@ async function main() {
       recruitWigglyCousinsToMarch(from, to, flowLayerContainer, {
         color: 0x66ccff,
         count: 20,
-        size: 800,
-        speed: 0.005
+        size: 200,
+        speed: 0.0005
       });
+      animateProfessionalCousins(from, to, flowLayerContainer, {
+        colorStart: '#66ccff',
+        colorEnd: '#ff66cc',
+        count: 20,
+        size: 1000,
+        speed: 0.002
+      });
+      
+      
       
 
   
@@ -872,6 +881,12 @@ async function main() {
         x: packEntryPoints.ST21.x + packEntryPoints.ST21.width / 2,
         y: packEntryPoints.ST21.y + packEntryPoints.ST21.height / 2
       };
+      recruitWigglyCousinsToMarch(from, to, flowLayerContainer, {
+        color: 0x66ccff,
+        count: 20,
+        size: 300,
+        speed: 0.0005
+      });
     } else if (coil.bay === "ST22" && packEntryPoints.ST22) {
       to = {
         x: packEntryPoints.ST22.x + packEntryPoints.ST22.width / 2,
@@ -880,7 +895,10 @@ async function main() {
     }
   
     if (from && to) {
+
       drawPullArrow(flowLayerContainer, from, to, 0x66ccff);
+      
+
       
 
     }
@@ -897,13 +915,10 @@ async function main() {
   
   startShockwaveEmitter(centerOfSprite(packEntryPoints.ST21), flowLayerContainer, { color: 0xff66cc });
   //testStaticParticles(flowLayerContainer);
+  
+  //Do not touch these fun loving wiggly cousins
   testAnimatedParticles(flowLayerContainer);
-  const debugDot = new PIXI.Graphics();
-debugDot.beginFill(0xff0000);
-debugDot.drawCircle(0, 0, 1000);
-debugDot.endFill();
-debugDot.position.set(305000, 225000);
-flowLayerContainer.addChild(debugDot);
+
 
 
   
@@ -1200,7 +1215,7 @@ app.ticker.add(() => {
 function recruitWigglyCousinsToMarch(from, to, container, {
   color = 0x66ccff,
   count = 20,
-  size = 800,
+  size = 200,
   speed = 0.003
 } = {}) {
   const particles = [];
@@ -1231,6 +1246,11 @@ function recruitWigglyCousinsToMarch(from, to, container, {
     for (const p of particles) {
       p._progress += speed;
       if (p._progress > 1) p._progress = 0;
+      p.rotation += 0.01;
+      const progress = p._progress; // from 0 → 1
+      p.tint = chroma.mix('#e413eb', '#87ec14', progress).num(); 
+
+
 
       const x = from.x + dx * p._progress;
       const y = from.y + dy * p._progress;
@@ -1238,6 +1258,141 @@ function recruitWigglyCousinsToMarch(from, to, container, {
     }
   });
 }
+
+function animateProfessionalCousins(from, to, container, {
+  colorStart = '#66ccff',
+  colorEnd = '#ffffff',
+  count = 20,
+  size = 800,
+  speed = 0.0015,
+  trail = false
+} = {}) {
+  const chromaScale = chroma.scale([colorStart, colorEnd]);
+  const particles = [];
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const spacing = 1 / count;
+
+  for (let i = 0; i < count; i++) {
+    const p = new PIXI.Sprite(PIXI.Texture.WHITE);
+    p.anchor.set(0.5);
+    p.width = p.height = size; // 👈 this was missing for i === 0
+    p.alpha = 0.7; // 🔧 baseline alpha to override tint invisibility
+  
+    const t = i * spacing;
+    const baseX = from.x + dx * t;
+    const baseY = from.y + dy * t;
+    p.baseX = baseX;
+    p.baseY = baseY;
+    p._progress = t;
+    p.phase = Math.random() * Math.PI * 2;
+    p.freq = 0.01 + Math.random() * 0.01;
+  
+    // ❗ Immediately set position
+    p.position.set(baseX, baseY);
+  
+    if (i === 0) {
+      p.tint = 0xff0000;
+      p.width = p.height = size * 2; // 👉 supersize for debugging
+      p.alpha = 1;
+    } else {
+      p.tint = chroma(colorStart).num(); // 💡 initialize tint properly
+    }
+  
+    container.addChild(p);
+    particles.push(p);
+  }
+  
+
+  let tick = 0;
+  app.ticker.add((delta) => {
+    tick += delta;
+    
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+
+      p._progress += speed * delta;
+      if (p._progress > 1) p._progress -= 1;
+      
+      const t = p._progress;
+      const x = from.x + dx * t;
+      const y = from.y + dy * t;
+      p.baseX = x;
+      p.baseY = y;
+      p.position.set(x, y); // ✅ Set every frame
+      
+      const softPulse = Math.sin((tick / 30 + i) * 0.3);
+      p.alpha = 0.5 + 0.2 * softPulse;
+      const scale = 0.9 + 0.1 * softPulse;
+      p.scale.set(scale);
+
+      const color = chromaScale(Math.min(Math.max(t, 0), 1)).num(); // 🛡️ clamp t safely
+      p.tint = color;
+
+    }
+  });
+}
+
+function animateStraightLineCousins(from, to, container, {
+  color = 0x66ccff,
+  count = 20,
+  size = 800,
+  speed = 0.003
+} = {}) {
+  const particles = [];
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+
+  for (let i = 0; i < count; i++) {
+    const p = new PIXI.Sprite(PIXI.Texture.WHITE);
+    p.tint = color;
+    p.width = p.height = size;
+    p.anchor.set(0.5); // 🔑 important
+    p.alpha = 0.8;
+
+    // Calculate position along line
+    const t = i / count;
+    const baseX = from.x + dx * t;
+    const baseY = from.y + dy * t;
+    p._progress = t;
+    p.baseX = baseX;
+    p.baseY = baseY;
+
+    p.position.set(baseX, baseY); // 🔥 this is where the mirror ghosts vanish if omitted
+
+    if (i === 0) {
+      p.tint = 0xff0000; // big red test cousin
+      p.width = p.height = 2000;
+      p.alpha = 1;
+    }
+
+    container.addChild(p);
+    particles.push(p);
+  }
+
+  let tick = 0;
+  app.ticker.add(() => {
+    tick += 1;
+    for (const p of particles) {
+      // 🧠 Move forward
+      p._progress += speed;
+      if (p._progress > 1) p._progress = 0;
+
+      const t = p._progress;
+      p.x = from.x + dx * t;
+      p.y = from.y + dy * t;
+
+      // 🎨 Subtle alpha pulse
+      p.alpha = 0.5 + 0.4 * Math.sin(tick * 0.05 + p.phase);
+      const scale = 0.9 + 0.1 * Math.cos(tick * 0.1 + p.phase);
+      p.scale.set(scale);
+    }
+  });
+}
+
+
+
+
 
 
 
