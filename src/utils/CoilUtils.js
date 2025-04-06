@@ -64,6 +64,7 @@ export function getPosition(coil) {
       isLocked: isLocked(coil),
       isOnHold: isOnHold(coil),
       displayName: getDisplayName(coil),
+      locationKey: `${coil.bay}-${coil.area}-${coil.rowname}-${coil.location}-${coil.layer}`,
     };
   }
   

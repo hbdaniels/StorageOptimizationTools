@@ -54,6 +54,11 @@ export async function initCanvas({ width = 1200, height = 800, backgroundColor =
   viewport.addChild(attributeUnderlay);
   viewport.addChild(labelLayer);
 
+  console.log("👁️ Renderer type:", app.renderer.gl ? "WebGL ✅" : "Canvas ❌");
+
+
+
+
   app.stage.scale.x = -1;
   app.stage.position.x = app.screen.width;
   app.stage.addChild(viewport);
@@ -103,6 +108,7 @@ export async function initCanvas({ width = 1200, height = 800, backgroundColor =
   const zoomAmount = e.deltaY > 0 ? 0.9 : 1.1;
   zoomScale.value *= zoomAmount;
   zoomScale.value = Math.min(Math.max(zoomScale.value, 0.002), 5);
+  console.log(zoomScale.value);
 
   const rect = app.canvas.getBoundingClientRect();
   const screenMouseX = e.clientX - rect.left;

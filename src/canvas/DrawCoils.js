@@ -12,10 +12,21 @@ import {coilColorRules} from '../canvas/CoilColorRules.js';
  * @param {Object} [options] - Optional styling or debug flags.
  */
 
+
 export function drawCoils(layer1CoilsContainer, layer2CoilsContainer, coils, options = {}) {
+
+    const {
+        locationMap = new Map(),
+        showLocationDetails = () => {},
+        renderLocationAttributeSummary = () => {},
+        attrHandler = null,
+        onToggleAttribute = () => {},
+      } = options;
+
     layer1CoilsContainer.removeChildren();
     layer2CoilsContainer.removeChildren();
-  
+    
+    let selectedSprite = null;
     if (!options.coilTexture) {
       console.warn("No coilTexture provided in options");
       return;
@@ -46,11 +57,36 @@ export function drawCoils(layer1CoilsContainer, layer2CoilsContainer, coils, opt
       sprite.addEventListener('pointerdown', () => {
         const panel = document.getElementById('coil-details-content');
         if (!panel) return;
-  
-        //const locationString = `${coil.bay}-${coil.area}-${coil.rowname}-${coil.location}-${coil.layer}`;
-        //console.log('📍 Coil Location String:', locationString);
+      
+        selectedSprite = coil;
+      
+        // 🔑 Construct the locationKey just like main.js
+        const locationKey = `${coil.bay}-${coil.area}-${coil.rowname}-${coil.location}-${coil.layer}`;
+      
+        console.log("🔍 Looking for location key:", locationKey);
+        console.log("🗺️ Available keys in locationMap:", [...locationMap.keys()].slice(0, 5), "...");
+      
+        const locationSprite = locationMap.get(locationKey);
+      
+        if (locationSprite) {
+          console.log("✅ Found matching location sprite:", locationSprite);
+          showLocationDetails(locationSprite);
+          const attrContainer = document.getElementById("location-details-attributes");
+          if (attrContainer && locationSprite?.attributes) {
+            renderLocationAttributeSummary({
+              containerEl: attrContainer,
+              attributes: locationSprite.attributes,
+              attrHandler,
+              onToggleAttribute
+            });
+          }
+        } else {
+          console.warn("❓ Couldn't find location sprite for:", locationKey);
+        }
+      
         panel.innerHTML = renderCoilDetails(coil);
       });
+      
   
       const containerNode = new PIXI.Container();
       containerNode.position.set(x, y);
@@ -100,6 +136,7 @@ export function drawCoils(layer1CoilsContainer, layer2CoilsContainer, coils, opt
         <div class="location-attr-row"><strong>On Hold:</strong> ${coil.on_hold}</div>
         <div class="location-attr-row"><strong>Previous Plant Code:</strong> ${coil.previous_plant_code || ''}</div>
         <div class="location-attr-row"><strong>Succesive Plant Code:</strong> ${coil.succesive_plant_code || ''}</div>
+        <div class="location-attr-row"><strong>Packaging Type:</strong> ${coil.packaging_type || ''}</div>
         
       `;
     }

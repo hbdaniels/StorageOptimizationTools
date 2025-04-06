@@ -12,6 +12,7 @@
     "vite": "^6.2.0"
   },
   "dependencies": {
+    "@pixi/filter-blur": "^7.4.3",
     "@pixi/filter-drop-shadow": "^5.2.0",
     "chroma-js": "^3.1.2",
     "node-fetch": "^2.7.0",

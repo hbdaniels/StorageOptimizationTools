@@ -89,13 +89,17 @@ document.getElementById("layer2CoilsToggle")?.addEventListener("change", (e) => 
   
 });
 
-const toggleEl = document.getElementById("layer1CoilsToggle");
-console.log("🧪 layer1CoilsToggle found?", !!toggleEl);
-
 document.getElementById("layer1CoilsToggle")?.addEventListener("change", (e) => {
   console.log("🔘 Layer 1 toggle changed:", e.target.checked);
   layer1CoilsContainer.visible = e.target.checked;
 });
+
+document.getElementById("flowLayerToggle")?.addEventListener("change", (e) => {
+  flowLayerContainer.visible = e.target.checked;
+});
+const flowLayerToggle = document.getElementById("flowLayerToggle");
+const showFlowLayer = flowLayerToggle?.checked ?? true;
+    flowLayerContainer.visible = showFlowLayer;
 
 
   
@@ -113,6 +117,9 @@ function createLabelCenteredInSprite(text, sprite, fontSize = 1000) {
       y: sprite.y + (sprite.height / 2) - (dummy.height / 2) + 200
     };
   }
+
+  
+  
   
 
 app.ticker.add(() => {
@@ -202,7 +209,8 @@ function drawLoadingStations() {
       label.y = height/2 - 1000;
   
       container.addChild(label);
-      viewport.addChild(container);
+      layer1Container.addChild(container);
+      //viewport.addChild(container);
     });
   }
   
@@ -420,60 +428,328 @@ function drawLoadingStations() {
   }
 
   function drawPullArrow(container, from, to, color = 0xff80bf, thickness = 300, alpha = 1, headLength = 800) {
-    const g = new PIXI.Graphics();
-    g.beginFill(color, alpha);
-  
     const fullDx = to.x - from.x;
     const fullDy = to.y - from.y;
     const totalLength = Math.sqrt(fullDx * fullDx + fullDy * fullDy);
-    const margin = 500; // 🔁 adjust this as needed
-
+    const margin = 500;
+  
     const ratio = (totalLength - margin) / totalLength;
     const dx = fullDx * ratio;
     const dy = fullDy * ratio;
     const length = Math.sqrt(dx * dx + dy * dy);
     const angle = Math.atan2(dy, dx);
-
   
     const bodyLength = length - headLength;
   
-    // Draw arrow body
-    g.moveTo(0, -thickness / 2);
-    g.lineTo(bodyLength, -thickness / 2);
-    g.lineTo(bodyLength, -thickness);
-    
-    // Arrowhead (triangle)
-    g.lineTo(length, 0);
-    g.lineTo(bodyLength, thickness);
-    g.lineTo(bodyLength, thickness / 2);
-    
-    g.lineTo(0, thickness / 2);
-    g.closePath();
-    g.endFill();
+    const gradientTexture = PIXI.Texture.from(generateFlowGradient(color));
   
+    // 📦 Gradient-filled arrow body as sprite
+    const body = new PIXI.Sprite(gradientTexture);
+    body.width = bodyLength;
+    body.height = thickness;
+    body.y = -thickness / 2;
+    body.alpha = alpha;
+  
+    // 🔺 Arrowhead as triangle graphic
+    const head = new PIXI.Graphics();
+    head.beginFill(color, alpha);
+    head.moveTo(0, -thickness);
+    head.lineTo(headLength, 0);
+    head.lineTo(0, thickness);
+    head.endFill();
+    head.x = bodyLength;
+  
+    // 🪝 Group arrow body and head together
+    const g = new PIXI.Container();
+    g.addChild(body);
+    g.addChild(head);
     g.position.set(from.x, from.y);
     g.rotation = angle;
-    
-
-    g.filters = [new DropShadowFilter({
-      blur: 4,
-      distance: 0,
-      color: 0x000000,
-      alpha: 0.3
-    })];
   
     container.addChild(g);
-    // Add subtle pulse animation
-let pulse = 0;
-app.ticker.add(() => {
-  pulse += 0.05;
-  const scaleFactor = 1 + 0.03 * Math.sin(pulse); // adjust amplitude/speed here
-  g.scale.set(scaleFactor);
-});
-
+  
+    // 💓 Subtle pulse animation
+    let pulse = 0;
+    app.ticker.add(() => {
+      pulse += 0.05;
+      const scaleFactor = 1 + 0.03 * Math.sin(pulse);
+      g.scale.set(scaleFactor);
+    });
+  
     return g;
   }
   
+  
+  function generateFlowGradient(colorHex) {
+  const colorStr = typeof colorHex === 'number'
+    ? `#${colorHex.toString(16).padStart(6, '0')}`
+    : colorHex;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 1;
+  const ctx = canvas.getContext('2d');
+
+  // ✅ ENABLE SMOOTHING
+  ctx.imageSmoothingEnabled = true;
+
+  const gradient = ctx.createLinearGradient(0, 0, 256, 0);
+  gradient.addColorStop(0, 'transparent');
+  gradient.addColorStop(1, colorStr);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 256, 1);
+
+  return canvas;
+}
+
+function getLocationCenter(locationKey, locationMap) {
+  const sprite = locationMap.get(locationKey);
+  
+  if (!sprite) {
+    console.warn(`❓ Location not found for key: ${locationKey}`);
+    return null;
+  }
+
+  // If your sprite has anchor (0.5), position is already the center
+  // If not, calculate it manually:
+  return {
+    x: sprite.x + sprite.width / 2,
+    y: sprite.y + sprite.height / 2
+  };
+}
+
+function centroidOf(locationKeys, locationMap) {
+  const validCoords = locationKeys
+    .map(key => getLocationCenter(key, locationMap))
+    .filter(Boolean);
+
+  if (validCoords.length === 0) return null;
+
+  const total = validCoords.reduce((acc, pos) => {
+    acc.x += pos.x;
+    acc.y += pos.y;
+    return acc;
+  }, { x: 0, y: 0 });
+
+  return {
+    x: total.x / validCoords.length,
+    y: total.y / validCoords.length
+  };
+}
+
+function centerOfSprite(sprite) {
+  return {
+    x: sprite.x + sprite.width / 2,
+    y: sprite.y + sprite.height / 2
+  };
+}
+
+function getPackEntryPoints(locationMap) {
+  const entries = {
+    ST21: null,
+    ST22: null
+  };
+
+  for (const [key, sprite] of locationMap.entries()) {
+    if (!sprite.attributes) continue;
+
+    for (const attr of sprite.attributes) {
+      if (attr.name === "3tn_ST21_PP_Entry") {
+        console.log("🎯 Found ST21 PACK entry at", key);
+        entries.ST21 = sprite;
+      }
+      if (attr.name === "3tn_ST22_PP_Entry") {
+        console.log("🎯 Found ST22 PACK entry at", key);
+        entries.ST22 = sprite;
+      }
+    }
+  }
+
+  console.log("📦 Final pack entry points:", entries);
+  return entries;
+}
+
+function drawPulseAt(container, center, color = 0x66ccff, maxRadius = 5000) {
+  const pulse = new PIXI.Graphics();
+  pulse.position.set(center.x, center.y);
+  container.addChild(pulse);
+
+  let t = 0;
+
+  app.ticker.add(() => {
+    t += 0.03;
+    const radius = (Math.sin(t) * 0.5 + 0.5) * maxRadius;
+    const alpha = 0.1 + 0.05 * Math.sin(t * 2); // soft fade pulse
+
+    pulse.clear();
+    pulse.beginFill(color, alpha);
+    pulse.drawCircle(0, 0, radius);
+    pulse.endFill();
+  });
+}
+
+function startGravityWaveEmitter(center, container, options = {}) {
+  const {
+    color = 0x66ccff,
+    spawnInterval = 40,   // Ticks between each new wave
+    maxRadius = 60000,
+    life = 120,           // Ticks each wave lives
+    baseAlpha = 0.25,
+  } = options;
+
+  const waves = [];
+  let tick = 0;
+
+  app.ticker.add(() => {
+    tick++;
+
+    // 💥 Spawn new wave periodically
+    if (tick % spawnInterval === 0) {
+      const ring = new PIXI.Graphics();
+      ring.life = 0; // time since spawn
+      waves.push(ring);
+      container.addChild(ring);
+    }
+
+    // 🌀 Update and draw all waves
+    for (let i = waves.length - 1; i >= 0; i--) {
+      const ring = waves[i];
+      ring.life++;
+
+      const progress = ring.life / life;
+      const radius = progress * maxRadius;
+      const alpha = baseAlpha * (1 - progress);
+
+      ring.clear();
+      ring.beginFill(color, alpha);
+      ring.drawCircle(0, 0, radius);
+      ring.endFill();
+      ring.position.set(center.x, center.y);
+
+      // 💀 Remove faded-out rings
+      if (ring.life >= life) {
+        container.removeChild(ring);
+        waves.splice(i, 1);
+      }
+    }
+  });
+}
+
+function createShockwaveRipple(center, container, {
+  color = 0x66ccff,
+  duration = 120,
+  maxRadius = 8000,
+  pulseCount = 3,
+  interval = 30
+} = {}) {
+  for (let i = 0; i < pulseCount; i++) {
+    setTimeout(() => {
+      const ripple = new PIXI.Graphics();
+      ripple.beginFill(color, 0.25);
+      ripple.drawCircle(0, 0, 50); // 👈 Give it some visible starting size
+      ripple.endFill();
+      ripple.position.set(center.x, center.y);
+      container.addChild(ripple);
+
+      let age = 0;
+
+      const animate = () => {
+        age++;
+        const progress = age / duration;
+        ripple.scale.set(progress * maxRadius / 50); // Normalize to original radius
+        ripple.alpha = 1 - progress;
+
+        if (age >= duration) {
+          app.ticker.remove(animate);
+          container.removeChild(ripple);
+        }
+      };
+
+      app.ticker.add(animate);
+    }, i * interval);
+  }
+}
+
+function startShockwaveEmitter(center, container, {
+  color = 0x66ccff,
+  duration = 120,
+  maxRadius = 8000,
+  pulseCount = 3,
+  interval = 30,
+  loopInterval = 2000 // milliseconds between full ripple sets
+} = {}) {
+  const emitRipples = () => {
+    for (let i = 0; i < pulseCount; i++) {
+      setTimeout(() => {
+        const ripple = new PIXI.Graphics();
+        ripple.beginFill(color, 0.25);
+        ripple.drawCircle(0, 0, 50); // Initial radius
+        ripple.endFill();
+        ripple.position.set(center.x, center.y);
+        container.addChild(ripple);
+
+        let age = 0;
+
+        const animate = () => {
+          age++;
+          const progress = age / duration;
+          ripple.scale.set(progress * maxRadius / 50); // Normalized to initial radius
+          ripple.alpha = 1 - progress;
+
+          if (age >= duration) {
+            app.ticker.remove(animate);
+            container.removeChild(ripple);
+          }
+        };
+
+        app.ticker.add(animate);
+      }, i * interval);
+    }
+  };
+
+  emitRipples(); // start immediately
+  setInterval(emitRipples, loopInterval);
+}
+
+
+
+
+function createDirectionalRipple(from, to, container, options = {}) {
+  const {
+    color = 0x00ccff,
+    waveLength = 100000,
+    speed = 2000,
+    lifetime = 100,
+    alpha = 0.1
+  } = options;
+
+  const angle = Math.atan2(to.y - from.y, to.x - from.x);
+  const wave = new PIXI.Graphics();
+  container.addChild(wave);
+
+  let t = 0;
+
+  app.ticker.add(() => {
+    if (t > lifetime) {
+      container.removeChild(wave);
+      return;
+    }
+
+    const offset = speed * t;
+    const x = from.x + Math.cos(angle) * offset;
+    const y = from.y + Math.sin(angle) * offset;
+
+    wave.clear();
+    wave.beginFill(color, alpha * (1 - t / lifetime));
+    wave.drawCircle(0, 0, waveLength * (t / lifetime));
+    wave.endFill();
+    wave.position.set(x, y);
+
+    t++;
+  });
+}
+
+
   
   
   
@@ -511,7 +787,14 @@ async function main() {
   //drawCoils(layer1CoilsContainer, coils, { debugLabels: true });
   
   const coilTexture = await PIXI.Assets.load('/src/assets/coil.png');
-  drawCoils(layer1CoilsContainer, layer2CoilsContainer, coils, { coilTexture });
+  drawCoils(layer1CoilsContainer, layer2CoilsContainer, coils, {
+    coilTexture,
+    locationMap,
+    showLocationDetails,
+    renderLocationAttributeSummary,
+    attrHandler,
+    onToggleAttribute,
+  });
   //viewport.addChild(layer1CoilsContainer);
   
   
@@ -525,17 +808,83 @@ async function main() {
   console.log("🧭 flowLayerContainer:", flowLayerContainer);
 
   for (const coil of coils) {
-    if (coil.succesive_plant_code === "SLH" &&
-    flowCoilIds.includes(coil.material_id)) {
+    if (
+      coil.succesive_plant_code === "SLH" &&
+      flowCoilIds.includes(coil.material_id)
+    ) {
       const from = { x: coil.coord_x, y: coil.coord_y };
       const to = { x: 458150, y: 229350 };
-    
-      console.log("🧭 Drawing line from", from, "to", to);
-    
-      drawPullArrow(flowLayerContainer, from, to);
+  
+      console.log("🧭 Drawing SLH flow line from", from, "to", to);
+  
+      drawPullArrow(flowLayerContainer, from, to, 0xd36aa1);
+  
+      // 🎯 New effects
+      createShockwaveRipple(to, flowLayerContainer, { color: 0xff66cc });
+      createDirectionalRipple(from, to, flowLayerContainer);
     }
   }
   
+
+  const packEntryPoints = getPackEntryPoints(locationMap);
+
+  for (const coil of coils) {
+    if (coil.succesive_plant_code !== "PACK") continue;
+
+    if (!coil.locationKey) {
+      console.log(coil);
+      console.warn(`🧯 Coil ${coil.material_id} is missing a locationKey`);
+      continue;
+    }
+    
+    const from = getLocationCenter(coil.locationKey, locationMap);
+    let to = null;
+  
+    if (coil.bay === "ST21" && packEntryPoints.ST21) {
+      console.log(`📦 Coil ${coil.material_id} → ${coil.bay} → PACK`);
+      to = {
+        x: packEntryPoints.ST21.x + packEntryPoints.ST21.width / 2,
+        y: packEntryPoints.ST21.y + packEntryPoints.ST21.height / 2
+      };
+    } else if (coil.bay === "ST22" && packEntryPoints.ST22) {
+      to = {
+        x: packEntryPoints.ST22.x + packEntryPoints.ST22.width / 2,
+        y: packEntryPoints.ST22.y + packEntryPoints.ST22.height / 2
+      };
+    }
+  
+    if (from && to) {
+      drawPullArrow(flowLayerContainer, from, to, 0x66ccff);
+      
+
+    }
+  }
+
+  //drawPulseAt(flowLayerContainer, centerOfSprite(packEntryPoints.ST21), 0xff00ff, 200000);
+  drawPulseAt(flowLayerContainer, centerOfSprite(packEntryPoints.ST21));
+  drawPulseAt(flowLayerContainer, centerOfSprite(packEntryPoints.ST22));
+
+
+  // startGravityWaveEmitter(centerOfSprite(packEntryPoints.ST21), flowLayerContainer);
+  // startGravityWaveEmitter(centerOfSprite(packEntryPoints.ST22), flowLayerContainer);
+
+  
+  startShockwaveEmitter(centerOfSprite(packEntryPoints.ST21), flowLayerContainer, { color: 0xff66cc });
+
+  
+  const blurFilter = new PIXI.BlurFilter(0.1);
+  const coilBlurFilter = new PIXI.BlurFilter(0.1);
+  flowLayerContainer.filters = [blurFilter];
+  layer1CoilsContainer.filters = [coilBlurFilter];
+
+  
+
+  app.ticker.add(() => {
+    const z = zoomScale.value;
+    blurFilter.blur = z < 0.003 ? 0.4 : z < 0.005 ? 0.2 : z < 0.01 ? 0 : 0.3;
+    coilBlurFilter.blur = z < 0.003 ? .05 : z < 0.005 ? .025 : z < 0.01 ? .01 : 0.3;
+  });
+
   const target = locationMap.get("ST21-A2-G-40");
   if (target) {
     target.tint = 0xff0000;
